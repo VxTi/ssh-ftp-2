@@ -1,0 +1,24 @@
+{
+  "name": "ssh-ftp-remake",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack --config webpack.config.js && electron ./src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@xterm/xterm": "^5.5.0",
+    "electron": "^29.3.0",
+    "ssh2": "^1.15.0"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.0.0-rc.6",
+    "webpack-cli": "^5.1.4"
+  }
+}
