@@ -1,4 +1,5 @@
 import { AbstractFileSystem } from "./abstract-file-system";
+import { IFileInfo } from "./file-info";
 
 export class LocalFileSystem implements AbstractFileSystem
 {
@@ -35,6 +36,11 @@ export class LocalFileSystem implements AbstractFileSystem
     readFile(path: string): Promise<string>
     {
         return window[ 'app' ][ 'localFs' ].read( path );
+    }
+
+    getFileInfo(path: string): Promise<IFileInfo>
+    {
+        return window[ 'app' ][ 'localFs' ].info( path );
     }
 
 }

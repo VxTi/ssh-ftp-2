@@ -5,7 +5,13 @@
 
 import { clearWindowContent } from "./window-content-manager";
 import { assembleSessionList } from "./session-view-list";
-import { appendTo, attachFutureListener, createElement } from "../util/element-assembler";
+import {
+    appendTo,
+    attachFutureListener,
+    CONTAINER_LEFT_RIGHT,
+    CONTAINER_TOP_BOTTOM,
+    createElement
+} from "../util/element-assembler";
 import { RemoteSession } from "../sessions/RemoteSession";
 
 /**
@@ -61,85 +67,88 @@ export function assembleAddSessionMenu()
 
     appendTo( container,
         /* Action container */
-        createElement( 'div', [ 'container', 'align-horizontal', 'main-end', 'nowrap', 'grow-1', 'session-actions' ], [
+        createElement( 'div', [ ...CONTAINER_LEFT_RIGHT, 'nowrap', 'grow-1', 'sidebar-action-container' ], [
             /* Cancel add session */
             createElement( 'div', [ 'action', 'action-cancel' ], [], {
                 id: 'action-cancel-session',
                 title: 'Go back to sessions page'
             } )
         ] ),
-        /* Title */
-        createElement( 'h3', [], [], { textContent: 'Add Session' } ),
-        createElement( 'div', [ 'add-session-input-container', 'container', 'align-horizontal', 'main-start', 'cross-start', 'grow-1' ], [
-            createElement( 'input', [ 'input-box', 'grow-1', 'round-left-5' ], [], {
+        /* Container with border */
+        createElement( 'div', [ ...CONTAINER_TOP_BOTTOM, 'holding-container' ], [
+            /* Title */
+            createElement( 'h3', [], [], { textContent: 'Add Session' } ),
+            createElement( 'div', [ 'add-session-input-container', 'container', 'align-horizontal', 'main-start', 'cross-start', 'grow-1' ], [
+                createElement( 'input', [ 'input-box', 'grow-1', 'round-left-5' ], [], {
+                    type: 'text',
+                    name: 'host',
+                    id: 'session-host',
+                    title: 'The host address of the session',
+                    placeholder: 'Host address'
+                }, { 'required': '' } ),
+                createElement( 'input', [ 'input-box', 'ssh-port', 'input-small-rect', 'round-right-5' ], [], {
+                    type: 'number',
+                    name: 'port',
+                    id: 'session-port',
+                    title: 'The port of the session',
+                    placeholder: 'Port'
+                }, { tabindex: '-1' } )
+            ] ),
+            /* Username */
+            createElement( 'input', [ 'add-session-input-container', 'input-box', 'round-5' ], [], {
                 type: 'text',
-                name: 'host',
-                id: 'session-host',
-                title: 'The host address of the session',
-                placeholder: 'Host address'
+                name: 'username',
+                id: 'session-username',
+                title: 'The username for the session',
+                placeholder: 'Username'
             }, { 'required': '' } ),
-            createElement( 'input', [ 'input-box', 'ssh-port', 'input-small-rect', 'round-right-5' ], [], {
-                type: 'number',
-                name: 'port',
-                id: 'session-port',
-                title: 'The port of the session',
-                placeholder: 'Port'
-            }, { tabindex: '-1' } )
-        ] ),
-        /* Username */
-        createElement( 'input', [ 'add-session-input-container', 'input-box', 'round-5' ], [], {
-            type: 'text',
-            name: 'username',
-            id: 'session-username',
-            title: 'The username for the session',
-            placeholder: 'Username'
-        }, { 'required': '' } ),
-        /* Password */
-        createElement( 'div', [ 'add-session-input-container', 'container', 'align-horizontal', 'main-start', 'cross-start', 'grow-1' ], [
-            createElement( 'input', [ 'input-box', 'grow-1', 'round-left-5' ], [], {
-                type: 'password',
-                name: 'password',
-                id: 'session-password',
-                title: 'The password for the session',
-                placeholder: 'Password'
-            } ),
-            createElement( 'input', [ 'show-password', 'input-small-rect', 'round-right-5' ], [], {
-                type: 'button',
-                name: 'show-password',
-                id: 'session-show-password',
-                title: 'Show or hide password visibility'
-            } )
-        ] ),
-        /* Private key and select private key from local storage  */
-        createElement( 'div', [ 'add-session-input-container', 'input-button-container' ], [
-            createElement( 'input', [ 'input-box', 'grow-1', 'round-left-5' ], [], {
+            /* Password */
+            createElement( 'div', [ 'add-session-input-container', 'container', 'align-horizontal', 'main-start', 'cross-start', 'grow-1' ], [
+                createElement( 'input', [ 'input-box', 'grow-1', 'round-left-5' ], [], {
+                    type: 'password',
+                    name: 'password',
+                    id: 'session-password',
+                    title: 'The password for the session',
+                    placeholder: 'Password'
+                } ),
+                createElement( 'input', [ 'show-password', 'input-small-rect', 'round-right-5' ], [], {
+                    type: 'button',
+                    name: 'show-password',
+                    id: 'session-show-password',
+                    title: 'Show or hide password visibility'
+                } )
+            ] ),
+            /* Private key and select private key from local storage  */
+            createElement( 'div', [ 'add-session-input-container', 'input-button-container' ], [
+                createElement( 'input', [ 'input-box', 'grow-1', 'round-left-5' ], [], {
+                    type: 'text',
+                    name: 'private-key',
+                    id: 'ssh-private-key',
+                    title: 'The private key for the server',
+                    placeholder: 'Private Key'
+                } ),
+                createElement( 'input', [ 'select-private-key', 'input-small-rect', 'round-right-5' ], [], {
+                    title: 'Select a private key file',
+                    type: 'button',
+                    id: 'ssh-select-private-key'
+                } )
+            ] ),
+            /* Passphrase */
+            createElement( 'input', [ 'add-session-input-container', 'input-box', 'round-5' ], [], {
                 type: 'text',
-                name: 'private-key',
-                id: 'ssh-private-key',
-                title: 'The private key for the server',
-                placeholder: 'Private Key'
+                name: 'passphrase',
+                id: 'ssh-passphrase',
+                title: 'The passphrase for the private key',
+                placeholder: 'Passphrase'
             } ),
-            createElement( 'input', [ 'select-private-key', 'input-small-rect', 'round-right-5' ], [], {
-                title: 'Select a private key file',
+            /* Connect button */
+            createElement( 'input', [ 'add-session-input-container', 'container', 'align-horizontal', 'main-center', 'cross-center', 'add-session-button', 'round-5' ], [], {
                 type: 'button',
-                id: 'ssh-select-private-key'
-            } )
-        ] ),
-        /* Passphrase */
-        createElement( 'input', [ 'add-session-input-container', 'input-box', 'round-5' ], [], {
-            type: 'text',
-            name: 'passphrase',
-            id: 'ssh-passphrase',
-            title: 'The passphrase for the private key',
-            placeholder: 'Passphrase'
-        } ),
-        /* Connect button */
-        createElement( 'input', [ 'add-session-input-container', 'add-session-button', 'round-5' ], [], {
-            type: 'button',
-            name: 'connect',
-            id: 'ssh-add-session',
-            title: 'Add SSH Session',
-            value: 'Add Session'
-        }, { tabindex: '4' } )
+                name: 'connect',
+                id: 'ssh-add-session',
+                title: 'Add SSH Session',
+                value: 'Add Session'
+            }, { tabindex: '4' } )
+        ] )
     );
 }

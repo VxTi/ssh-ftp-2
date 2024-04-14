@@ -4,7 +4,14 @@
 import { clearWindowContent } from "./window-content-manager";
 import { RemoteSession } from "../sessions/RemoteSession";
 import { assembleAddSessionMenu } from "./session-add-new";
-import { appendTo, attachFutureListener, createElement } from "../util/element-assembler";
+import {
+    appendTo,
+    attachFutureListener,
+    CONTAINER_HORIZONTAL_CENTER,
+    CONTAINER_LEFT_RIGHT,
+    CONTAINER_TOP_BOTTOM,
+    createElement
+} from "../util/element-assembler";
 
 /**
  * Function to assemble the session list.
@@ -14,7 +21,6 @@ import { appendTo, attachFutureListener, createElement } from "../util/element-a
 export function assembleSessionList()
 {
     clearWindowContent( 'side-container' ); // Clear the side container
-    let targetContainer = document.getElementById( 'side-container' );
 
     attachFutureListener( 'action-add-session', 'click', assembleAddSessionMenu );
     attachFutureListener( 'action-delete-session', 'click', _ =>
@@ -25,23 +31,56 @@ export function assembleSessionList()
             .querySelectorAll( 'session-element' )
             .forEach( (element: HTMLElement) => element.remove() );
 
-        loadSessionList( targetContainer );
+        loadSessionList( document.getElementById('session-list-container') );
     } );
 
-    appendTo( targetContainer,
-        /* Action container */
-        createElement( 'div', [ 'container', 'align-horizontal', 'main-end', 'nowrap', 'grow-1', 'session-actions' ], [
-            /* Actions */
-            createElement( 'div', [ 'action', 'action-delete' ], [], { id: 'action-delete-session', title: 'Delete selected session' } ),
-            createElement( 'div', [ 'action', 'action-refresh' ], [], { id: 'action-refresh-sessions', title: 'Reload session page' } ),
-            createElement( 'div', [ 'action', 'action-add' ], [], { id: 'action-add-session', title: 'Add a new session' } )
-        ] ),
-        /* Title */
-        createElement( 'h3', [], [], { textContent: 'Sessions' } ),
+    /* Add the selected attribute to the search input and focus the textbox */
+    attachFutureListener( 'action-search-session', 'click', _ =>
+    {
+        document.getElementById( 'action-search-session' )
+            .setAttribute( 'selected', '' );
+        let inputBox = document.getElementById( 'search-input-session' );
+        inputBox.focus();
+        inputBox.addEventListener('blur', () => (inputBox as HTMLInputElement).value = '' );
+    } )
 
+    appendTo( document.getElementById( 'side-container' ),
+            /* Action container */
+            createElement( 'div', [ ...CONTAINER_HORIZONTAL_CENTER, 'nowrap', 'grow-1', 'sidebar-action-container' ], [
+                /* Actions */
+
+                /* 'Add Session' container (icon and text) */
+                createElement( 'div', [ ...CONTAINER_LEFT_RIGHT, 'action', 'grow-1', 'action-add-container', 'round-5' ], [
+                    createElement( 'span', [ 'icon', 'rect-fit-vertical', 'action-add' ] ),
+                    createElement( 'span', [ ...CONTAINER_HORIZONTAL_CENTER, 'grow-1' ], [], { textContent: 'Add session' } )
+                ], { id: 'action-add-session', title: 'Add a new session' } ),
+
+                /* Search input container */
+                createElement( 'div', [ ...CONTAINER_LEFT_RIGHT, 'action', 'action-search-container', 'round-5' ], [
+                    createElement( 'span', [ 'icon', 'rect-fit-vertical', 'action-search' ] ),
+                    createElement( 'input', [ 'search-input' ], [], {
+                        id: 'search-input-session',
+                        title: 'Search session'
+                    } )
+                ], { id: 'action-search-session', title: 'Search session' } ),
+                createElement( 'div', [ 'action', 'action-refresh' ], [], {
+                    id: 'action-refresh-sessions',
+                    title: 'Reload session page'
+                } ),
+                createElement( 'div', [ 'action', 'action-delete' ], [], {
+                    id: 'action-delete-session',
+                    title: 'Delete selected session'
+                } )
+            ] ),
+
+        /* Container with border */
+        createElement( 'div', [ ...CONTAINER_TOP_BOTTOM, 'holding-container' ], [
+            /* Title */
+            createElement( 'h3', [], [], { textContent: 'Sessions' } ),
+        ], { id: 'session-list-container' } ),
     );
 
-    loadSessionList( targetContainer );
+    loadSessionList( document.getElementById('session-list-container') );
 }
 
 /**
@@ -63,6 +102,6 @@ function loadSessionList(targetContainer: HTMLElement)
                 sessionElement.setAttribute( 'port', (session.port || 22).toString() );
                 sessionElement.setAttribute( 'sessionUid', session.sessionUid.toString() );
                 targetContainer.appendChild( sessionElement );
-            })
+            } )
         } );
 }

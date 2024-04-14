@@ -33,6 +33,27 @@ const __app_main_context = {
             fs.promises.readFile(filePath, { encoding: 'utf-8' }),
 
         /**
+         * Get the information about a file at the given path.
+         * @param {string} filePath - The path to the file to get information about.
+         * @returns {IFileInfo} - The information about the file.
+         */
+        info: (filePath) =>
+        {
+            let fileStats = fs.lstatSync(filePath);
+            return {
+                permissions: fileStats.mode,
+                size: fileStats.size,
+                dateCreated: fileStats.ctime,
+                dateModified: fileStats.mtime,
+                name: path.basename(filePath),
+                type: fileStats.isDirectory() ? 'directory' : path.extname(filePath),
+                path: filePath,
+                isDir: fileStats.isDirectory(),
+                isFile: fileStats.isFile(),
+            };
+        },
+
+        /**
          * Move a file from one path to another.
          * @param {string} oldPath - The path to the file to move.
          * @param {string} newPath - The path to move the file to.

@@ -3,6 +3,7 @@
  * This interface is used to define the methods that
  * are required for an abstract file system.
  */
+import { IFileInfo } from "./file-info";
 
 export interface AbstractFileSystem
 {
@@ -49,4 +50,11 @@ export interface AbstractFileSystem
      * @param paths The paths to delete.
      */
     deleteFiles(paths: string[]): Promise<void>;
+
+    /**
+     * Method to get the file type.
+     * @param path The path to get the file type from.
+     * @returns The file type.
+     */
+    getFileInfo(path: string): Promise<IFileInfo>;
 }

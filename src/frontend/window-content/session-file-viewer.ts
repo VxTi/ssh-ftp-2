@@ -1,5 +1,13 @@
 import { clearWindowContent } from "./window-content-manager";
-import { appendTo, attachFutureListener, createElement } from "../util/element-assembler";
+import {
+    appendTo,
+    attachFutureListener,
+    CONTAINER_HORIZONTAL_CENTER,
+    CONTAINER_LEFT_RIGHT,
+    CONTAINER_RIGHT_LEFT,
+    CONTAINER_TOP_BOTTOM,
+    createElement
+} from "../util/element-assembler";
 import { LocalFileSystem } from "../util/file-management/local-file-system";
 
 /**
@@ -21,9 +29,9 @@ export function assembleFileViewer()
 
     appendTo( document.getElementById( 'inner-content' ),
         /* Action container */
-        createElement( 'div', [ 'container', 'align-horizontal', 'main-space-between', 'cross-start', 'border-bottom' ], [
+        createElement( 'div', [ 'container', 'align-horizontal', 'main-space-between', 'cross-start', 'border-bottom', 'bg-semi-dark' ], [
             /* Navigation actions */
-            createElement( 'div', [ 'container', 'align-horizontal', 'cross-start', 'main-start' ], [
+            createElement( 'div', CONTAINER_LEFT_RIGHT, [
                 createElement( 'span', [ 'action', 'action-back' ], [], { title: 'Go back', id: 'action-back' } ),
                 createElement( 'span', [ 'action', 'action-forward' ], [], {
                     title: 'Go forward',
@@ -31,8 +39,8 @@ export function assembleFileViewer()
                 } ),
             ] ),
             /* File actions */
-            createElement( 'div', [ 'container', 'align-horizontal', 'main-end', 'cross-center', 'border-bottom' ], [
-                    createElement( 'div', [ 'container', 'align-horizontal', 'main-center', 'cross-center', 'view-mode-container' ], [
+            createElement( 'div', [ ...CONTAINER_RIGHT_LEFT, 'border-bottom' ], [
+                    createElement( 'div', [ ...CONTAINER_HORIZONTAL_CENTER, 'view-mode-container' ], [
                         createElement( 'span', [ 'action', 'view-mode-icons' ], [], {
                             title: 'Icons',
                             id: 'action-view-icons'
@@ -44,28 +52,25 @@ export function assembleFileViewer()
                     ] ),
                     createElement( 'span', [ 'action', 'action-add' ], [], { title: 'Add file', id: 'action-add-file' } ),
                     createElement( 'span', [ 'action', 'action-refresh' ], [], { title: 'Refresh', id: 'action-refresh' } ),
-                    createElement( 'span', [ 'action', 'action-delete' ], [], { title: 'Delete', id: 'action-delete-file' } ),
+                    createElement( 'span', [ 'action', 'action-delete' ], [], {
+                        title: 'Delete',
+                        id: 'action-delete-file'
+                    } ),
                 ]
             ),
         ] ),
         /* File viewer container */
-        createElement( 'div', [ 'container', 'align-horizontal', 'main-start', 'cross-start', 'grow-1' ], [
-            createElement( 'div', [ 'container', 'align-vertical', 'main-start', 'cross-start', 'grow-1', 'full-height', 'border-right' ], [], { id: 'localfs' }),
-            createElement( 'div', [ 'container', 'align-vertical', 'main-start', 'cross-start', 'full-height', 'grow-1' ], [], { id: 'remotefs' })
+        createElement( 'div', [ ...CONTAINER_LEFT_RIGHT, 'grow-1' ], [
+
+            createElement( 'div', [ ...CONTAINER_TOP_BOTTOM, 'grow-1', 'full-width', 'full-height', 'border-right' ], [
+                /* Local file system container */
+                createElement( 'div', [ ...CONTAINER_TOP_BOTTOM, 'full-width', 'file-container' ], [], { id: 'localfs' } ),
+            ] ),
+
+            /* Remote file system container */
+            createElement( 'div', [ ...CONTAINER_TOP_BOTTOM, 'full-height', 'grow-1', 'file-container' ], [], { id: 'remotefs' } )
         ] ),
         /* Terminal container */
         createElement( 'div', [ 'container', 'align-horizontal', 'main-start', 'cross-start', 'border-top', 'terminal' ], [], { id: 'terminal' } )
     );
-
-    let localFs = document.getElementById( 'localfs' );
-    let localfsObj: LocalFileSystem = new LocalFileSystem();
-    localfsObj.listFiles( '/' )
-        .then( files =>
-        {
-            files.forEach( file =>
-            {
-                appendTo( localFs, createElement( 'file-element', [], [], {}, { name: file } ) );
-            } );
-        } );
-
 }
