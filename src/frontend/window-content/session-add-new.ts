@@ -18,14 +18,15 @@ export function assembleAddSessionMenu()
 
     let container = document.getElementById( 'side-container' );
 
-    attachFutureListener( 'action-cancel-session', 'click', _ => assembleSessionList( ) );
-    attachFutureListener( 'session-show-password', 'click', event => {
+    attachFutureListener( 'action-cancel-session', 'click', _ => assembleSessionList() );
+    attachFutureListener( 'session-show-password', 'click', event =>
+    {
         let passwordInput = document.getElementById( 'session-password' );
         if ( passwordInput.getAttribute( 'type' ) === 'password' )
             passwordInput.setAttribute( 'type', 'text' );
         else
             passwordInput.setAttribute( 'type', 'password' );
-    });
+    } );
     attachFutureListener( 'ssh-add-session', 'click', _ =>
     {
         let keysOrdered: string[] = [ 'host', 'port', 'username', 'password', 'privateKey', 'passphrase' ];
@@ -50,14 +51,13 @@ export function assembleAddSessionMenu()
 
         let values: string[] = elements.map( element => element.value );
         let sessionPreObj = {};
-        elements.forEach( (_, index) => sessionPreObj[ keysOrdered[ index ] ] = values[ index ]);
+        elements.forEach( (_, index) => sessionPreObj[ keysOrdered[ index ] ] = values[ index ] );
         let sessionObj: RemoteSession = sessionPreObj as RemoteSession;
 
-        window[ 'app'][ 'sessions' ].add( sessionObj );
+        window[ 'app' ][ 'sessions' ].add( sessionObj )
+            .then( () => assembleSessionList() );
 
-        assembleSessionList();
-
-    });
+    } );
 
     appendTo( container,
         /* Action container */
@@ -77,14 +77,14 @@ export function assembleAddSessionMenu()
                 id: 'session-host',
                 title: 'The host address of the session',
                 placeholder: 'Host address'
-            }, { 'required': '' }),
+            }, { 'required': '' } ),
             createElement( 'input', [ 'input-box', 'ssh-port', 'input-small-rect', 'round-right-5' ], [], {
                 type: 'number',
                 name: 'port',
                 id: 'session-port',
                 title: 'The port of the session',
                 placeholder: 'Port'
-            }, { tabindex: '-1'} )
+            }, { tabindex: '-1' } )
         ] ),
         /* Username */
         createElement( 'input', [ 'add-session-input-container', 'input-box', 'round-5' ], [], {
@@ -112,7 +112,7 @@ export function assembleAddSessionMenu()
         ] ),
         /* Private key and select private key from local storage  */
         createElement( 'div', [ 'add-session-input-container', 'input-button-container' ], [
-            createElement( 'input', [ 'input-box', 'grow-1', 'round-left-5'], [], {
+            createElement( 'input', [ 'input-box', 'grow-1', 'round-left-5' ], [], {
                 type: 'text',
                 name: 'private-key',
                 id: 'ssh-private-key',
@@ -140,6 +140,6 @@ export function assembleAddSessionMenu()
             id: 'ssh-add-session',
             title: 'Add SSH Session',
             value: 'Add Session'
-        }, { tabindex: '4'} )
+        }, { tabindex: '4' } )
     );
 }

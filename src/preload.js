@@ -111,8 +111,8 @@ const __app_main_context = {
         add: async (session) =>
         {
             let sessions = await __app_main_context.sessions.get();
-            if ( !session.hasOwnProperty('sessionUid') )
-                session.sessionUid = Math.floor(Math.random() * 1000000);
+            if ( !session.hasOwnProperty('sessionUid') || session.sessionUid === 0)
+                session.sessionUid = __app_main_context.sessions.genUid();
             sessions.push(session);
             await __app_main_context.sessions.set(sessions);
         },
@@ -129,14 +129,14 @@ const __app_main_context = {
          * Update the content of a session in the sessions file.
          * @param {RemoteSession} session - The session to update in the file.
          */
-        update: (session) =>
+        update: async (session) =>
         {
-            let sessions = __app_main_context.sessions.get();
+            let sessions = await __app_main_context.sessions.get();
             let index = sessions.findIndex(s => s.sessionUid === session.sessionUid);
             if ( index > -1 ) // Check if the session exists in the file.
             {
                 sessions[index] = session;
-                __app_main_context.sessions.set(sessions);
+                await __app_main_context.sessions.set(sessions);
             }
         },
 
@@ -152,11 +152,6 @@ const __app_main_context = {
             {
                 sessions.splice(index, 1);
                 await __app_main_context.sessions.set(sessions);
-            }
-            else
-            {
-                console.error('Session not found');
-                console.log(sessions);
             }
         }
     }

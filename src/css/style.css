@@ -172,6 +172,7 @@ body {
     box-sizing: content-box;
     margin: 2px;
     background-size: 75%;
+    fill: var(--text-color-2);
 }
 
 .action:hover, .action[selected] { background-color: var(--theme-3); }

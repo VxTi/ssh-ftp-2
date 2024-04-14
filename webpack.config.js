@@ -5,6 +5,7 @@ module.exports = {
         "app": [
             './src/frontend/core-functionality.ts',
             './src/util/appstate.ts',
+            './src/frontend/custom-elements/file-element.ts',
             './src/frontend/custom-elements/session-element.ts',
             './src/frontend/custom-elements/circular-loading-element.ts',
             './src/frontend/sessions/sessions-manager',

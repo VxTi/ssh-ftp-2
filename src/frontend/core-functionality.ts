@@ -67,11 +67,12 @@ window.addEventListener('session:connected', (event: CustomEvent) => {
     assembleFileViewer();
 });
 
-window.addEventListener('session:delete', event => {
-    console.log("Deleting session");
+/**
+ * Event listener for when a session is deleted.
+ */
+window.addEventListener('session:delete', () => {
     document.querySelectorAll('session-element[selected]').forEach((element: HTMLElement) =>
     {
-        console.log("Deleting session with UID: ", element.getAttribute('sessionUid'));
         window[ 'app' ][ 'sessions' ].delete(element.getAttribute('sessionUid'));
         element.remove();
     });

@@ -11,8 +11,10 @@ export class FileElement extends HTMLElement {
 
     connectedCallback()
     {
-        let shadow = this.attachShadow({mode: 'open'});
-
+        this.innerHTML = `
+            <span class="icon file-thumbnail"></span>
+            <span class="file-name">${this.getAttribute('name')}</span>
+        `
     }
 
 }

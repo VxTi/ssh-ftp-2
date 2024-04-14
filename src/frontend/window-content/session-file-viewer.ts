@@ -1,5 +1,6 @@
 import { clearWindowContent } from "./window-content-manager";
 import { appendTo, attachFutureListener, createElement } from "../util/element-assembler";
+import { LocalFileSystem } from "../util/file-management/local-file-system";
 
 /**
  * Function for generating the file viewer.
@@ -8,16 +9,17 @@ export function assembleFileViewer()
 {
     clearWindowContent( 'inner-content' );
 
-    attachFutureListener( 'action-back', 'click', _ => window.dispatchEvent( new CustomEvent( 'file-viewer:back' ) ) );
-    attachFutureListener( 'action-forward', 'click', _ => window.dispatchEvent( new CustomEvent( 'file-viewer:forward' ) ) );
-    attachFutureListener( 'action-view-icons', 'click', _ => window.dispatchEvent( new CustomEvent( 'file-viewer:view-icons' ) ) );
-    attachFutureListener( 'action-view-rows', 'click', _ => window.dispatchEvent( new CustomEvent( 'file-viewer:view-rows' ) ) );
-    attachFutureListener( 'action-add', 'click', _ => window.dispatchEvent( new CustomEvent( 'file-viewer:add-file' ) ) );
-    attachFutureListener( 'action-refresh', 'click', _ => window.dispatchEvent( new CustomEvent( 'file-viewer:refresh' ) ) );
-    attachFutureListener( 'action-delete', 'click', _ => window.dispatchEvent( new CustomEvent( 'file-viewer:delete-file' ) ) );
+    /*
+     * Attach event listeners to the action buttons.
+     * These will dispatch custom events to the window object in
+     * the format of 'file-viewer:<action>'.
+     */
+    [ 'back', 'forward', 'view-icons', 'view-rows', 'add-file', 'refresh', 'delete-file' ]
+        .forEach( action =>
+            attachFutureListener( `action-${ action }`, 'click', _ =>
+                window.dispatchEvent( new CustomEvent( `file-viewer:${ action }` ) ) ) );
 
     appendTo( document.getElementById( 'inner-content' ),
-
         /* Action container */
         createElement( 'div', [ 'container', 'align-horizontal', 'main-space-between', 'cross-start', 'border-bottom' ], [
             /* Navigation actions */
@@ -40,19 +42,30 @@ export function assembleFileViewer()
                             id: 'action-view-rows'
                         } ),
                     ] ),
-                    createElement( 'span', [ 'action', 'action-add' ], [], { title: 'Add file', id: 'action-add' } ),
+                    createElement( 'span', [ 'action', 'action-add' ], [], { title: 'Add file', id: 'action-add-file' } ),
                     createElement( 'span', [ 'action', 'action-refresh' ], [], { title: 'Refresh', id: 'action-refresh' } ),
-                    createElement( 'span', [ 'action', 'action-delete' ], [], { title: 'Delete', id: 'action-delete' } ),
+                    createElement( 'span', [ 'action', 'action-delete' ], [], { title: 'Delete', id: 'action-delete-file' } ),
                 ]
             ),
         ] ),
         /* File viewer container */
         createElement( 'div', [ 'container', 'align-horizontal', 'main-start', 'cross-start', 'grow-1' ], [
-            createElement( 'div', [ 'container', 'align-vertical', 'main-start', 'cross-start', 'grow-1', 'full-height', 'border-right' ] ),
-            createElement( 'div', [ 'container', 'align-vertical', 'main-start', 'cross-start', 'full-height', 'grow-1' ] )
+            createElement( 'div', [ 'container', 'align-vertical', 'main-start', 'cross-start', 'grow-1', 'full-height', 'border-right' ], [], { id: 'localfs' }),
+            createElement( 'div', [ 'container', 'align-vertical', 'main-start', 'cross-start', 'full-height', 'grow-1' ], [], { id: 'remotefs' })
         ] ),
         /* Terminal container */
         createElement( 'div', [ 'container', 'align-horizontal', 'main-start', 'cross-start', 'border-top', 'terminal' ], [], { id: 'terminal' } )
     );
+
+    let localFs = document.getElementById( 'localfs' );
+    let localfsObj: LocalFileSystem = new LocalFileSystem();
+    localfsObj.listFiles( '/' )
+        .then( files =>
+        {
+            files.forEach( file =>
+            {
+                appendTo( localFs, createElement( 'file-element', [], [], {}, { name: file } ) );
+            } );
+        } );
 
 }
