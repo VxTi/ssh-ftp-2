@@ -4,14 +4,12 @@
 export interface RemoteSessionProperties
 {
     sessionUid: number;
-    hostAddress: string;
+    host: string;
     port?: number;
     username: string;
     password?: string;
     passphrase?: string;
     privateKey?: string;
-    fingerprint?: boolean;
-    protocol: string;
 }
 
 /**
@@ -27,8 +25,6 @@ export class RemoteSession
     password?: string;
     privateKey?: string;
     passphrase?: string;
-    fingerprint?: boolean;
-    protocol: string;
 
     /**
      * Constructor for the RemoteSession class.
@@ -37,13 +33,11 @@ export class RemoteSession
     constructor(properties: RemoteSessionProperties)
     {
         this.sessionUid = properties.sessionUid;
-        this.host = properties.hostAddress;
-        this.port = properties.port || 0;
+        this.host = properties.host;
+        this.port = properties.port || 22;
         this.username = properties.username;
         this.password = properties.password || '';
         this.passphrase = properties.passphrase || '';
         this.privateKey = properties.privateKey || '';
-        this.fingerprint = properties.fingerprint || false;
-        this.protocol = properties.protocol;
     }
 }

@@ -39,7 +39,7 @@ window.addEventListener('session:request-connect', (event: CustomEvent) => {
         detail: {
             sessionUid: event.detail.sessionUid
         }
-    })), 2000);
+    })), 1000);
 })
 
 /**
@@ -47,7 +47,7 @@ window.addEventListener('session:request-connect', (event: CustomEvent) => {
  * This will remove the selected attribute from all elements.
  */
 window.addEventListener('click', event => {
-    if ( event.target instanceof HTMLElement && event.target.closest('[selected]') === null )
+    if ( event.target instanceof HTMLElement && event.target.closest(':is([selected], .action)') === null )
         document.querySelectorAll('[selected]').forEach((element: HTMLElement) =>
             element.removeAttribute('selected'));
 })
@@ -65,4 +65,15 @@ window.addEventListener('session:connected', (event: CustomEvent) => {
     });
     // Assemble page
     assembleFileViewer();
-})
+});
+
+window.addEventListener('session:delete', event => {
+    console.log("Deleting session");
+    document.querySelectorAll('session-element[selected]').forEach((element: HTMLElement) =>
+    {
+        console.log("Deleting session with UID: ", element.getAttribute('sessionUid'));
+        window[ 'app' ][ 'sessions' ].delete(element.getAttribute('sessionUid'));
+        element.remove();
+    });
+});
+

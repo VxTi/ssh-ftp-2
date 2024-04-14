@@ -4,6 +4,9 @@
 
 let __queuedEventListeners: Map<string, Map<string, EventListener[]>> = new Map();
 
+export const CONTAINER_LEFT_RIGHT = [ 'container', 'align-horizontal', 'main-start', 'cross-start', 'grow-1' ];
+export const CONTAINER_SPREAD_AROUND = [ 'container', 'align-horizontal', 'main-space-between', 'cross-start', 'grow-1' ];
+
 /**
  * Creates an HTMLElement with the specified type, properties, attributes, and children.
  * @param type The type of the element to create.

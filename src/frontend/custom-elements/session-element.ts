@@ -6,12 +6,7 @@
 export class SessionElement extends HTMLElement
 {
 
-    private selected: boolean = false;
-
-    constructor()
-    {
-        super();
-    }
+    constructor() { super(); }
 
     connectedCallback()
     {
@@ -24,7 +19,7 @@ export class SessionElement extends HTMLElement
         `
         this.addEventListener( 'dblclick', _ =>
         {
-            if ( !this.hasAttribute( 'sessionUid' ) || this.hasAttribute('inactive'))
+            if ( !this.hasAttribute( 'sessionUid' ) || this.hasAttribute('inactive') || this.hasAttribute('connected') )
                 return;
 
             this.setAttribute( 'connecting', '' );

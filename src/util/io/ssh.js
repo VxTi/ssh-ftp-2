@@ -79,7 +79,7 @@ class SSHConnection
     connect()
     {
         this.#client.connect({
-            host: this.#sessionProperties.hostAddress,
+            host: this.#sessionProperties.host,
             port: this.#sessionProperties.port,
             username: this.#sessionProperties.username,
             password: this.#sessionProperties.password,

@@ -6,6 +6,7 @@
 import { clearWindowContent } from "./window-content-manager";
 import { assembleSessionList } from "./session-view-list";
 import { appendTo, attachFutureListener, createElement } from "../util/element-assembler";
+import { RemoteSession } from "../sessions/RemoteSession";
 
 /**
  * Function to assemble the add session menu.
@@ -17,7 +18,46 @@ export function assembleAddSessionMenu()
 
     let container = document.getElementById( 'side-container' );
 
-    attachFutureListener( 'action-cancel-session', 'click', _ => assembleSessionList( true ) );
+    attachFutureListener( 'action-cancel-session', 'click', _ => assembleSessionList( ) );
+    attachFutureListener( 'session-show-password', 'click', event => {
+        let passwordInput = document.getElementById( 'session-password' );
+        if ( passwordInput.getAttribute( 'type' ) === 'password' )
+            passwordInput.setAttribute( 'type', 'text' );
+        else
+            passwordInput.setAttribute( 'type', 'password' );
+    });
+    attachFutureListener( 'ssh-add-session', 'click', _ =>
+    {
+        let keysOrdered: string[] = [ 'host', 'port', 'username', 'password', 'privateKey', 'passphrase' ];
+        let elements: HTMLInputElement[] = [ 'session-host', 'session-port', 'session-username', 'session-password', 'ssh-private-key', 'ssh-passphrase' ]
+            .map( id => (document.getElementById( id ) as HTMLInputElement) );
+
+        let faulty = false;
+        for ( let element of elements )
+        {
+            if ( element.hasAttribute( 'required' ) && !element.value )
+            {
+                element.setAttribute( 'input-error', '' );
+                faulty = true;
+            }
+            else if ( element.hasAttribute( 'input-error' ) )
+                element.removeAttribute( 'input-error' );
+        }
+
+        // If any of the elements are faulty, return
+        if ( faulty )
+            return;
+
+        let values: string[] = elements.map( element => element.value );
+        let sessionPreObj = {};
+        elements.forEach( (_, index) => sessionPreObj[ keysOrdered[ index ] ] = values[ index ]);
+        let sessionObj: RemoteSession = sessionPreObj as RemoteSession;
+
+        window[ 'app'][ 'sessions' ].add( sessionObj );
+
+        assembleSessionList();
+
+    });
 
     appendTo( container,
         /* Action container */
@@ -31,39 +71,39 @@ export function assembleAddSessionMenu()
         /* Title */
         createElement( 'h3', [], [], { textContent: 'Add Session' } ),
         createElement( 'div', [ 'add-session-input-container', 'container', 'align-horizontal', 'main-start', 'cross-start', 'grow-1' ], [
-            createElement( 'input', [ 'input-box' ], [], {
+            createElement( 'input', [ 'input-box', 'grow-1', 'round-left-5' ], [], {
                 type: 'text',
                 name: 'host',
                 id: 'session-host',
                 title: 'The host address of the session',
                 placeholder: 'Host address'
-            } ),
-            createElement( 'input', [ 'input-box', 'ssh-port' ], [], {
+            }, { 'required': '' }),
+            createElement( 'input', [ 'input-box', 'ssh-port', 'input-small-rect', 'round-right-5' ], [], {
                 type: 'number',
                 name: 'port',
                 id: 'session-port',
                 title: 'The port of the session',
                 placeholder: 'Port'
-            } )
+            }, { tabindex: '-1'} )
         ] ),
         /* Username */
-        createElement( 'input', [ 'add-session-input-container', 'input-box' ], [], {
+        createElement( 'input', [ 'add-session-input-container', 'input-box', 'round-5' ], [], {
             type: 'text',
             name: 'username',
             id: 'session-username',
             title: 'The username for the session',
             placeholder: 'Username'
-        } ),
+        }, { 'required': '' } ),
         /* Password */
         createElement( 'div', [ 'add-session-input-container', 'container', 'align-horizontal', 'main-start', 'cross-start', 'grow-1' ], [
-            createElement( 'input', [ 'input-box' ], [], {
+            createElement( 'input', [ 'input-box', 'grow-1', 'round-left-5' ], [], {
                 type: 'password',
                 name: 'password',
                 id: 'session-password',
                 title: 'The password for the session',
                 placeholder: 'Password'
             } ),
-            createElement( 'input', [ 'show-password', 'nested-button' ], [], {
+            createElement( 'input', [ 'show-password', 'input-small-rect', 'round-right-5' ], [], {
                 type: 'button',
                 name: 'show-password',
                 id: 'session-show-password',
@@ -72,20 +112,21 @@ export function assembleAddSessionMenu()
         ] ),
         /* Private key and select private key from local storage  */
         createElement( 'div', [ 'add-session-input-container', 'input-button-container' ], [
-            createElement( 'input', [ 'input-box', 'nested-input' ], [], {
+            createElement( 'input', [ 'input-box', 'grow-1', 'round-left-5'], [], {
                 type: 'text',
                 name: 'private-key',
                 id: 'ssh-private-key',
                 title: 'The private key for the server',
                 placeholder: 'Private Key'
             } ),
-            createElement( 'div', [ 'select-private-key', 'nested-button' ], [], {
+            createElement( 'input', [ 'select-private-key', 'input-small-rect', 'round-right-5' ], [], {
                 title: 'Select a private key file',
+                type: 'button',
                 id: 'ssh-select-private-key'
             } )
         ] ),
         /* Passphrase */
-        createElement( 'input', [ 'add-session-input-container', 'input-box' ], [], {
+        createElement( 'input', [ 'add-session-input-container', 'input-box', 'round-5' ], [], {
             type: 'text',
             name: 'passphrase',
             id: 'ssh-passphrase',
@@ -93,12 +134,12 @@ export function assembleAddSessionMenu()
             placeholder: 'Passphrase'
         } ),
         /* Connect button */
-        createElement( 'input', [ 'add-session-input-container', 'add-session-button' ], [], {
+        createElement( 'input', [ 'add-session-input-container', 'add-session-button', 'round-5' ], [], {
             type: 'button',
             name: 'connect',
-            id: 'ssh-login',
+            id: 'ssh-add-session',
             title: 'Add SSH Session',
             value: 'Add Session'
-        } )
+        }, { tabindex: '4'} )
     );
 }

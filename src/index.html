@@ -7,7 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     <title>SSH FTP</title>
-    <link rel="stylesheet" href="../node_modules/@xterm/xterm/css/xterm.css" />
     <script src="bundle/app-bundle.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -17,14 +16,13 @@
 
     <!-- Left sidebar (T->B) -->
     <div class="container align-vertical main-start border-right" id="sidebar-container">
-        <!--<div class="container align-horizontal main-start info-container border-bottom" id="status-indicator-container"></div> --><!-- Status indicator -->
-        <div class="container align-vertical main-start cross-center" id="side-container"> <!-- Sessions container --></div>
+        <!-- Sessions container -->
+        <div class="container align-vertical main-start cross-center" id="side-container"></div>
     </div>
 
     <!-- content container (T->B) -->
-    <div class="container align-vertical main-start grow-1 nowrap" id="inner-content">
-        <!-- Inner content must be generated in JavaScript, depending on the required content -->
-    </div>
+    <!-- Inner content must be generated in JavaScript -->
+    <div class="container align-vertical main-start grow-1 nowrap" id="inner-content"></div>
 </div>
 </body>
 </html>
