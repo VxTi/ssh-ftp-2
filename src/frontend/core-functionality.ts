@@ -68,12 +68,8 @@ window.addEventListener( 'click', event =>
 function loadFiles(path: string, targetElement: HTMLElement, fileSystem: AbstractFileSystem)
 {
 
-    console.log( "Loading files from path: ", path );
-    if ( !path )
-    {
-        console.error( "Path is not defined" );
-        return;
-    }
+    if ( !path || typeof path !== 'string' )
+        throw new Error( "'loadFiles' was called with an invalid path value." );
 
     targetElement.innerHTML = '';
     let prevDirFile = createElement( 'file-element', [], [], {}, {

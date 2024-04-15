@@ -1,0 +1,19 @@
+/**
+ * Theme: Bright
+ */
+
+:root {
+    --primary-bg: #d1dff6;
+    --secondary-bg: #eeeeee;
+    --input-hover-bg: #a4acc1;
+    --input-inactive-bg: #11121c;
+    --input-static-bg: #c1c8e3;
+    --input-active-bg: #76a3ff;
+    --input-border-bg: #323850;
+    --border-1: #000;
+    --border-2: #343840;
+    --text-color: #0a0a0a;
+    --text-color-2: #000000;
+    --container-resize-color: #ccc;
+    --text-shadow: none;
+}

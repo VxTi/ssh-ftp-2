@@ -29,7 +29,7 @@ export function assembleFileViewer()
 
     appendTo( document.getElementById( 'inner-content' ),
         /* Action container */
-        createElement( 'div', [ 'container', 'align-horizontal', 'main-space-between', 'cross-start', 'border-bottom', 'bg-semi-dark' ], [
+        createElement( 'div', [ 'container', 'align-horizontal', 'main-space-between', 'cross-start', 'border-bottom', 'bg-secondary' ], [
             /* Navigation actions */
             createElement( 'div', CONTAINER_LEFT_RIGHT, [
                 createElement( 'span', [ 'action', 'action-back' ], [], { title: 'Go back', id: 'action-back' } ),
@@ -39,7 +39,7 @@ export function assembleFileViewer()
                 } ),
             ] ),
             /* File actions */
-            createElement( 'div', [ ...CONTAINER_RIGHT_LEFT, 'border-bottom' ], [
+            createElement( 'div', CONTAINER_RIGHT_LEFT, [
                     createElement( 'div', [ ...CONTAINER_HORIZONTAL_CENTER, 'view-mode-container' ], [
                         createElement( 'span', [ 'action', 'view-mode-icons' ], [], {
                             title: 'Icons',
@@ -71,6 +71,15 @@ export function assembleFileViewer()
             createElement( 'div', [ ...CONTAINER_TOP_BOTTOM, 'full-height', 'grow-1', 'file-container' ], [], { id: 'remotefs' } )
         ] ),
         /* Terminal container */
-        createElement( 'div', [ 'container', 'align-horizontal', 'main-start', 'cross-start', 'border-top', 'terminal' ], [], { id: 'terminal' } )
+        createElement( 'div', [ 'container', 'align-vertical', 'main-start', 'border-top', 'terminal' ], [
+            /* Open terminal windows container */
+            createElement( 'div', [ ...CONTAINER_LEFT_RIGHT, 'full-width', 'bg-secondary'], [
+                createElement('div', [ 'terminal-tab' ])
+            ]),
+            /* Main terminal content */
+            createElement('div', [ ...CONTAINER_LEFT_RIGHT, 'full-width', 'full-height', 'terminal-content' ], [], { id: 'terminal-content' })
+        ], { id: 'terminal' } )
     );
+    document.querySelectorAll('.terminal-tab')
+        .forEach((tab: HTMLElement) => tab.innerText = 'Terminal')
 }

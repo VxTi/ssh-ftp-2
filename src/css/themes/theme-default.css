@@ -1,0 +1,24 @@
+:root {
+    --primary-bg: #0a1019;
+    --secondary-bg: #101826;
+
+    /** Input element colors **/
+    --input-hover-bg: #282e3d;
+    --input-inactive-bg: #11121c;
+    --input-static-bg: #1e2336;
+    --input-active-bg: #1a3c81;
+    --input-border-bg: #323850;
+
+    --border-1: #000;
+    --border-2: #343840;
+
+    --text-color: #fff;
+    --text-color-2: #ccc;
+
+    --container-resize-color: #ccc;
+
+    --font: 'San Francisco', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-barlow: 'Barlow-Thin', sans-serif;
+    --text-shadow: none;
+}

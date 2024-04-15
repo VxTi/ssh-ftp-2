@@ -44,6 +44,7 @@ export function assembleSessionList()
         inputBox.addEventListener('blur', () => (inputBox as HTMLInputElement).value = '' );
     } )
 
+    /** Side container content */
     appendTo( document.getElementById( 'side-container' ),
             /* Action container */
             createElement( 'div', [ ...CONTAINER_HORIZONTAL_CENTER, 'nowrap', 'grow-1', 'sidebar-action-container' ], [
@@ -74,7 +75,7 @@ export function assembleSessionList()
             ] ),
 
         /* Container with border */
-        createElement( 'div', [ ...CONTAINER_TOP_BOTTOM, 'holding-container' ], [
+        createElement( 'div', [ ...CONTAINER_TOP_BOTTOM, 'holding-container', 'h-max-500' ], [
             /* Title */
             createElement( 'h3', [], [], { textContent: 'Sessions' } ),
         ], { id: 'session-list-container' } ),

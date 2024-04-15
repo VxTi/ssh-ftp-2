@@ -19,8 +19,8 @@ export function setContentDefault()
                 backgroundImage: `url(./assets/icons/${ window[ 'app' ].icon })`
                 } } ),
             createElement('div', [ 'container', 'align-vertical', 'main-center', 'cross-center' ], [
-                createElement( 'h1', ['text-semi-light'], [], { textContent: `Welcome to ${ window[ 'app' ].name }.` } ),
-                createElement( 'span', ['text-semi-light'], [], { innerHTML: 'To get started, add a session on the left, and join<br>it by double-clicking it.' } )
+                createElement( 'h1', ['text-color-secondary'], [], { textContent: `Welcome to ${ window[ 'app' ].name }.` } ),
+                createElement( 'span', ['text-color-secondary'], [], { innerHTML: 'To get started, add a session on the left, and join<br>it by double-clicking it.' } )
             ])
         ], { id: 'default-content' } )
     );

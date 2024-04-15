@@ -138,13 +138,10 @@ function __init(ipcMain, app)
         if ( !isConnected(sessionUid) )
             return Promise.reject('Session not connected.');
 
-        console.log("Retrieving file info: ", filePath, sessionUid);
-
         return activeSessions.get(sessionUid)
             /* Name Type Permissions(rwx) size(bytes) Modified(seconds) Created(seconds) */
             .ssh.execCommand(`stat -c "%n\n%F\n%A\n%s\n%Y\n%X" ${filePath}`)
             .then(result => {
-                console.log(result);
                 let segments = result.stdout.split('\n');
                 return {
                     name: segments[0],
