@@ -28,27 +28,23 @@ document.addEventListener( 'DOMContentLoaded', _ =>
     assembleSessionList();
 } );
 
-window.addEventListener( 'session:request-connect', (event: CustomEvent) =>
+/**
+ * Event listener for when a session is created.
+ * This event is called from `./util/ssh.js` when one attempts to connect
+ * with it, when calling `window.app.sessions.connect(sessionUid)`
+ */
+window.addEventListener( 'session:attempt-connect', (event: CustomEvent) =>
 {
     console.log( "Attempting to connect to session with UID: ", event.detail.sessionUid );
-
     // Set all session elements to in-active
     // This is a temporary solution to prevent multiple connections
     document.querySelectorAll( 'session-element' ).forEach( (element: HTMLElement) =>
     {
         element.setAttribute( 'inactive', '' );
-        if ( element.hasAttribute( 'connecting' ) )
-            element.removeAttribute( 'connecting' );
+        element.removeAttribute( 'connecting' );
         if ( element.getAttribute( 'sessionUid' ) === event.detail.sessionUid )
             element.setAttribute( 'connecting', '' );
     } )
-
-    // Simulate connection
-    setTimeout( _ => window.dispatchEvent( new CustomEvent( 'session:connected', {
-        detail: {
-            sessionUid: event.detail.sessionUid
-        }
-    } ) ), 500 );
 } )
 
 /**
@@ -62,53 +58,92 @@ window.addEventListener( 'click', event =>
             element.removeAttribute( 'selected' ) );
 } )
 
-// Event listener for when a session is connected
-window.addEventListener( 'session:connected', (event: CustomEvent) =>
-{
-    console.log( "Connected to session with UID: ", event.detail.sessionUid );
-    document.querySelectorAll( 'session-element' ).forEach( (element: HTMLElement) =>
-    {
-        element.removeAttribute( 'inactive' );
-        if ( element.hasAttribute( 'connecting' ) )
-            element.removeAttribute( 'connecting' );
-        if ( element.getAttribute( 'sessionUid' ) === event.detail.sessionUid )
-            element.setAttribute( 'connected', '' );
-    } );
-    // Assemble page
-    assembleFileViewer();
-    localFileSystem = new LocalFileSystem();
-    remoteFileSystem = new RemoteFileSystem();
-    /** Assemble the file system components */
-    let localFs = document.getElementById( 'localfs' );
-    let remoteFs = document.getElementById( 'remotefs' );
-    loadFiles( '/', localFs, localFileSystem );
-    loadFiles( '/', remoteFs, remoteFileSystem );
-} );
-
 /**
  * Function to load files into a file viewer
  * with the given path, target element and file system.
+ * @param path - The path to load files from.
+ * @param targetElement - The target element to load files into.
+ * @param fileSystem - The file system to load files from.
  */
 function loadFiles(path: string, targetElement: HTMLElement, fileSystem: AbstractFileSystem)
 {
+
+    console.log( "Loading files from path: ", path );
+    if ( !path )
+    {
+        console.error( "Path is not defined" );
+        return;
+    }
+
+    targetElement.innerHTML = '';
+    let prevDirFile = createElement( 'file-element', [], [], {}, {
+        name: '..',
+        path: path,
+        'file-type': 'directory',
+    } );
+    appendTo( targetElement, prevDirFile );
+    prevDirFile.addEventListener( 'click', (event: MouseEvent) =>
+    {
+        let pathParts = path.split( '/' );
+        pathParts.pop();
+        let newPath = pathParts.join( '/' ) || '/';
+        console.log( "Navigating to: ", newPath );
+        if ( newPath !== path )
+            loadFiles( newPath, targetElement, fileSystem );
+    } );
     fileSystem.listFiles( path )
         .then( (files: string[]) =>
         {
             files.forEach( (file: string) =>
             {
-                fileSystem.getFileInfo( file )
+                fileSystem.fileInfo( path + '/' + file )
                     .then( fileInfo =>
                     {
-                        appendTo(targetElement, createElement( 'file-element', [], [], {
+                        if ( fileInfo?.hidden )
+                            return;
+                        let foundFile = createElement( 'file-element', [], [], {}, {
                             name: file,
                             path: path,
-                            type: fileInfo.type,
-                            size: fileInfo.size,
-                        } ));
-                    })
+                            'file-type': fileInfo.type
+                        } )
+                        appendTo( targetElement, foundFile );
+                        foundFile.addEventListener( 'click', (event: MouseEvent) =>
+                        {
+                            console.log( "File clicked: ", fileInfo );
+                            if ( fileInfo.isDirectory )
+                                loadFiles( path + '/' + file, targetElement, fileSystem );
+                        } )
+                    } )
+                    .catch( console.error );
             } );
-        })
+        } )
 }
+
+/**
+ * Event listener for when a session is connected.
+ * This event is emitted from `./util/ssh.js` when a connection is established.
+ */
+window[ 'app' ].handleEvent( 'ssh:connected', (sessionUid: string) =>
+{
+    document.querySelectorAll( 'session-element' ).forEach( (element: HTMLElement) =>
+    {
+        element.removeAttribute( 'inactive' );
+        element.removeAttribute( 'connecting' );
+        if ( element.getAttribute( 'sessionUid' ) === sessionUid )
+            element.setAttribute( 'connected', '' );
+    } );
+    // Assemble page
+    assembleFileViewer();
+
+    (async () => {
+        localFileSystem = new LocalFileSystem();
+        remoteFileSystem = new RemoteFileSystem(sessionUid);
+        /** Assemble the file system components */
+
+        loadFiles( await remoteFileSystem.homeDirectory(), document.getElementById( 'remotefs' ), remoteFileSystem );
+        loadFiles( await localFileSystem.homeDirectory(), document.getElementById( 'localfs' ), localFileSystem );
+    })();
+} )
 
 /**
  * Event listener for when a session is deleted.
@@ -131,7 +166,7 @@ window.addEventListener( 'session:file-viewer:navigate', (event: CustomEvent) =>
     }
     else
     {
-        console.log( "Navigating to session with UID: ", event.detail.sessionUid, " and path: ", event.detail.path);
+        console.log( "Navigating to session with UID: ", event.detail.sessionUid, " and path: ", event.detail.path );
     }
-})
+} )
 

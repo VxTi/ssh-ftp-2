@@ -28,13 +28,9 @@ export class SessionElement extends HTMLElement
                 return;
 
             this.setAttribute( 'connecting', '' );
+            console.log( "Connecting to session: ", this.getAttribute( 'sessionUid' ) );
+            window[ 'app' ][ 'sessions' ].connect( this.getAttribute( 'sessionUid' ) );
 
-            window.dispatchEvent( new CustomEvent( 'session:request-connect', {
-                    detail: {
-                        sessionUid: this.getAttribute( 'sessionUid' )
-                    }
-                } )
-            );
         } );
         this.addEventListener( 'click', _ =>
             this.setAttribute( 'selected', '' ) );

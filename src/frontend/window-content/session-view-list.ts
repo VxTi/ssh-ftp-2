@@ -2,7 +2,7 @@
  * @module session-list
  */
 import { clearWindowContent } from "./window-content-manager";
-import { RemoteSession } from "../sessions/RemoteSession";
+import { RemoteSession } from "../sessions/remote-session";
 import { assembleAddSessionMenu } from "./session-add-new";
 import {
     appendTo,

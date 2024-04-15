@@ -6,7 +6,6 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
 const os = require('os');
-const fs = require('fs');
 const path = require('path');
 
 /**
@@ -21,8 +20,16 @@ const __app_main_context = {
         isMac: os.platform() === 'darwin',
         platform: os.platform(),
     },
+    /**
+     * Handle an event from the main process.
+     * @param {string} eventName - The name of the event to handle.
+     * @param {Function} handler - The handler function for the event.
+     */
+    handleEvent: (eventName, handler) =>
+        ipcRenderer.on(eventName, (event, ...args) => handler(...args)),
     localFs: {
         appDirectory: ipcRenderer.sendSync('app:path'),
+        homeDir: os.homedir(),
 
         /**
          * Read the contents of a file at the given path.
@@ -30,7 +37,7 @@ const __app_main_context = {
          * @returns {Promise<string>} - The contents of the file.
          */
         read: (filePath) =>
-            fs.promises.readFile(filePath, { encoding: 'utf-8' }),
+            ipcRenderer.invoke('localfs:read', filePath),
 
         /**
          * Get the information about a file at the given path.
@@ -38,20 +45,7 @@ const __app_main_context = {
          * @returns {IFileInfo} - The information about the file.
          */
         info: (filePath) =>
-        {
-            let fileStats = fs.lstatSync(filePath);
-            return {
-                permissions: fileStats.mode,
-                size: fileStats.size,
-                dateCreated: fileStats.ctime,
-                dateModified: fileStats.mtime,
-                name: path.basename(filePath),
-                type: fileStats.isDirectory() ? 'directory' : path.extname(filePath),
-                path: filePath,
-                isDir: fileStats.isDirectory(),
-                isFile: fileStats.isFile(),
-            };
-        },
+            ipcRenderer.invoke('localfs:info', filePath),
 
         /**
          * Move a file from one path to another.
@@ -59,7 +53,7 @@ const __app_main_context = {
          * @param {string} newPath - The path to move the file to.
          */
         move: (oldPath, newPath) =>
-            fs.promises.rename(oldPath, newPath),
+            ipcRenderer.invoke('localfs:move', oldPath, newPath),
 
         /**
          * List the contents of a directory at the given path.
@@ -67,14 +61,14 @@ const __app_main_context = {
          * @returns {Promise<string[]>} - The contents of the directory.
          */
         list: (dirPath) =>
-            fs.promises.readdir(dirPath),
+            ipcRenderer.invoke('localfs:list', dirPath),
 
         /**
          * Delete a file at the given path.
          * @param {string} filePath - The path to the file to delete.
          */
         delete: (filePath) =>
-            fs.promises.unlink(filePath),
+            ipcRenderer.invoke('localfs:delete', filePath),
 
         /**
          * Write data to a file at the given path.
@@ -82,98 +76,125 @@ const __app_main_context = {
          * @param {string} data - The data to write to the file.
          */
         write: (filePath, data) =>
-            fs.promises.writeFile(filePath, data, { encoding: 'utf-8' }),
+            ipcRenderer.invoke('localfs:write', filePath, data),
         /**
          * Check if a file exists at the given path.
          * @param {string} filePath - The path to the file to check.
          * @returns {boolean} - True if the file exists, false otherwise.
          */
         exists: (filePath) =>
-            fs.existsSync(filePath),
-    },
-    sessions: {
+            ipcRenderer.sendSync('localfs:exists', filePath),
 
         /**
-         * Generate a unique ID.
-         * @returns {number} - A unique ID.
+         * Create a directory at the given path.
+         * @param {string} dirPath - The path to the directory to create.
          */
-        genUid: () => Math.floor(Math.random() * 1000000),
+        mkdir: (dirPath) =>
+            ipcRenderer.invoke('localfs:mkdir', dirPath),
+    },
+    // All SSH related functions
+    sessions: {
 
         /**
          * Get the sessions from the sessions file.
          * @returns {Promise<RemoteSession[]>} - The sessions from the file.
          */
         get: async () =>
-        {
-            let content = await __app_main_context.localFs.read(path.join(__app_main_context.localFs.appDirectory, 'sessions.json'));
-            let sessions = JSON.parse(content);
-            if ( !Array.isArray(sessions) )
-                return [];
-
-            let hasChanged = sessions.some(session =>
-            {
-                if ( !session.hasOwnProperty('sessionUid') )
-                {
-                    session.sessionUid = __app_main_context.sessions.genUid();
-                    return true;
-                }
-                return false;
-            });
-
-            if ( hasChanged )
-                await __app_main_context.sessions.set(sessions);
-
-            return sessions;
-        },
+            ipcRenderer.invoke('ssh:load-sessions'),
         /**
          * Add a new session to the sessions file.
          * @param {RemoteSession} session - The session to add to the file.
          */
         add: async (session) =>
-        {
-            let sessions = await __app_main_context.sessions.get();
-            if ( !session.hasOwnProperty('sessionUid') || session.sessionUid === 0)
-                session.sessionUid = __app_main_context.sessions.genUid();
-            sessions.push(session);
-            await __app_main_context.sessions.set(sessions);
-        },
+            ipcRenderer.invoke('ssh:add-session', session),
 
-        /**
-         * Update the sessions file with the new sessions.
-         * @param {RemoteSession[]} sessions - The new sessions to write to the file.
-         */
-        set: (sessions) =>
-            __app_main_context.localFs.write(path.join(__app_main_context.localFs.appDirectory, 'sessions.json'),
-                JSON.stringify(sessions)),
-
-        /**
-         * Update the content of a session in the sessions file.
-         * @param {RemoteSession} session - The session to update in the file.
-         */
-        update: async (session) =>
-        {
-            let sessions = await __app_main_context.sessions.get();
-            let index = sessions.findIndex(s => s.sessionUid === session.sessionUid);
-            if ( index > -1 ) // Check if the session exists in the file.
-            {
-                sessions[index] = session;
-                await __app_main_context.sessions.set(sessions);
-            }
-        },
 
         /**
          * Delete a session from the sessions file.
          * @param {string} sessionUid - The UID of the session to delete.
          */
         delete: async (sessionUid) =>
-        {
-            let sessions = await __app_main_context.sessions.get();
-            let index = sessions.findIndex(s => s.sessionUid + '' === sessionUid);
-            if ( index > -1 ) // Check if the session exists in the file.
+            ipcRenderer.invoke('ssh:remove-session', sessionUid),
+
+        /**
+         * Connect to an SSH session.
+         * @param {string} sessionUid - The UID of the session to connect to.
+         */
+        connect: (sessionUid) =>
+            ipcRenderer.invoke('ssh:connect-session', sessionUid),
+
+        /**
+         * Disconnect from an SSH session.
+         * @param {string} sessionUid - The UID of the session to disconnect from.
+         */
+        disconnect: async (sessionUid) =>
+            ipcRenderer.invoke('ssh:disconnect-session', sessionUid),
+
+        /**
+         * Check if an SSH session is connected.
+         * @param {string} sessionUid - The UID of the session to check.
+         */
+        isConnected: async (sessionUid) =>
+            ipcRenderer.invoke('ssh:is-connected', sessionUid),
+
+        // All file system related functions
+        fs: {
+            /**
+             * Retrieves the home directory of the provided SSH session
+             * @param {string} sessionUid - The UID of the session to get the home directory of.
+             */
+            homeDir: (sessionUid) =>
             {
-                sessions.splice(index, 1);
-                await __app_main_context.sessions.set(sessions);
-            }
+                console.log('preload call: homeDir', sessionUid)
+                return ipcRenderer.invoke('ssh:home-dir', sessionUid)
+            },
+
+            /**
+             * Lists the contents of a directory on the remote server.
+             */
+            list: async (sessionUid, dirPath) =>
+                ipcRenderer.invoke('ssh:list-files', sessionUid, dirPath),
+
+            /**
+             * Uploads file(s) to the remote server.
+             * @param {string} sessionUid - The UID of the session to upload the file(s) to.
+             * @param {string[]} localPaths - The path to the local file(s) to upload.
+             * @param {string} remotePath - The path to the remote directory to upload the file(s) to.
+             */
+            upload: async (sessionUid, localPaths, remotePath) =>
+                ipcRenderer.invoke('ssh:upload-files', sessionUid, localPaths, remotePath),
+
+            /**
+             * Downloads file(s) from the remote server.
+             * @param {string} sessionUid - The UID of the session to download the file(s) from.
+             * @param {string[]} remotePaths - The path to the remote file(s) to download.
+             * @param {string} localPath - The path to the local directory to download the file(s) to.
+             */
+            download: async (sessionUid, remotePaths, localPath) =>
+                ipcRenderer.invoke('ssh:download-files', sessionUid, remotePaths, localPath),
+
+            /**
+             * Deletes file(s) on the remote server.
+             * @param {string} sessionUid - The UID of the session to delete the file(s) from.
+             * @param {string[]} remotePaths - The path to the remote file(s) to delete.
+             */
+            delete: async (sessionUid, remotePaths) =>
+                ipcRenderer.invoke('ssh:delete-files', sessionUid, remotePaths),
+
+            /**
+             * Moves a file on the remote server.
+             */
+            move: async (sessionUid, source, destination) =>
+                ipcRenderer.invoke('ssh:move-file', sessionUid, source, destination),
+
+            /**
+             * Gives information about a file on the remote server.
+             * @param sessionUid
+             * @param remotePath
+             * @returns {Promise<any>}
+             */
+            info: async (sessionUid, remotePath) =>
+                ipcRenderer.invoke('ssh:file-info', sessionUid, remotePath),
         }
     }
 }

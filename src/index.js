@@ -10,6 +10,10 @@ const { createWindow } = require('./util/window');
 const path = require("node:path");
 const os = require("node:os");
 
+// Register all event handlers for the main process
+require('./util/io/localfs-handlers')(ipcMain);
+require('./util/io/ssh')(ipcMain, app);
+
 
 /** @type {Electron.BrowserWindow} */
 let mainWindow = null;
@@ -18,12 +22,12 @@ const APP_DIRECTORY = path.join(app.getPath('appData'), 'SSH-FTP');
 
 app.whenReady().then(_ => {
     let indexPath = path.join(__dirname, 'index.html');
-    mainWindow = createWindow(indexPath);
+    mainWindow = createWindow(indexPath, { width: 1400, height: 900});
 
     app.on('activate', _ =>
     {
         if ( BrowserWindow.getAllWindows().length === 0 )
-            createWindow(indexPath);
+            mainWindow = createWindow(indexPath);
     })
     app.on('window-all-closed', _ => os.platform() === 'darwin' || app.quit())
 })

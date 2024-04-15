@@ -19,31 +19,20 @@ export interface AbstractFileSystem
      */
     readFile(path: string): Promise<string>;
 
-    /**
-     * Method to write to a file.
-     * @param path The path to write to.
-     * @param content The content to write to the file.
-     */
-    putFile(path: string, content: string): Promise<void>;
 
     /**
      * Method to write multiple files.
      * @param files The files to write.
      */
-    putFiles(files: { [key: string]: string }): Promise<void>;
+    putFiles(files: { path: string, content: string }[]): Promise<void>;
 
     /**
      * Method to move a file.
      * @param oldPath The old path of the file.
      * @param newPath The new path of the file.
+     * @param dstFs The destination file system.
      */
-    moveFile(oldPath: string, newPath: string): Promise<void>;
-
-    /**
-     * Method to delete a file.
-     * @param path The path to delete.
-     */
-    deleteFile(path: string): Promise<void>;
+    moveFile(oldPath: string, newPath: string, dstFs: AbstractFileSystem): Promise<void>;
 
     /**
      * Method to delete multiple files.
@@ -56,5 +45,12 @@ export interface AbstractFileSystem
      * @param path The path to get the file type from.
      * @returns The file type.
      */
-    getFileInfo(path: string): Promise<IFileInfo>;
+    fileInfo(path: string): Promise<IFileInfo>;
+
+    /**
+     * Method for retrieving the home directory
+     * of the file system.
+     * @returns The home directory.
+     */
+    homeDirectory(): Promise<string>;
 }

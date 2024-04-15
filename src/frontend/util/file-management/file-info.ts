@@ -6,11 +6,12 @@ export interface IFileInfo {
     readonly name: string;
     readonly path: string;
     readonly isFile: boolean;
-    readonly isDir: boolean;
+    readonly isDirectory: boolean;
     readonly isSymLink: boolean;
     readonly type: string;
-    readonly size: number;
-    readonly dateCreated: Date;
-    readonly dateModified: Date;
-    readonly permissions: number;
+    readonly size?: number;
+    readonly hidden?: boolean;
+    readonly dateCreated?: number;
+    readonly dateModified?: number;
+    readonly permissions: string;
 }

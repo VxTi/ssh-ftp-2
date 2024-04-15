@@ -12,7 +12,7 @@ import {
     CONTAINER_TOP_BOTTOM,
     createElement
 } from "../util/element-assembler";
-import { RemoteSession } from "../sessions/RemoteSession";
+import { RemoteSession } from "../sessions/remote-session";
 
 /**
  * Function to assemble the add session menu.

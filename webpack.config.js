@@ -9,7 +9,7 @@ module.exports = {
             './src/frontend/custom-elements/session-element.ts',
             './src/frontend/custom-elements/circular-loading-element.ts',
             './src/frontend/sessions/sessions-manager',
-            './src/frontend/sessions/RemoteSession',
+            './src/frontend/sessions/remote-session',
         ]
     },
     output: {
