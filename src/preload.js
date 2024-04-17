@@ -20,6 +20,10 @@ const __app_main_context = {
         isMac: os.platform() === 'darwin',
         platform: os.platform(),
     },
+    path: {
+        sep: path.sep,
+        join: (...args) => path.join(...args),
+    },
     /**
      * Handle an event from the main process.
      * @param {string} eventName - The name of the event to handle.
@@ -137,6 +141,15 @@ const __app_main_context = {
         isConnected: async (sessionUid) =>
             ipcRenderer.invoke('ssh:is-connected', sessionUid),
 
+        /**
+         * Execute a command on the remote server.
+         * @param {string} sessionUid - The UID of the session to execute the command on.
+         * @param {string} command - The command to execute.
+         * @returns {Promise<string>}
+         */
+        exec: async (sessionUid, command) =>
+            ipcRenderer.invoke('ssh:exec', sessionUid, command),
+
         // All file system related functions
         fs: {
             /**
@@ -144,10 +157,7 @@ const __app_main_context = {
              * @param {string} sessionUid - The UID of the session to get the home directory of.
              */
             homeDir: (sessionUid) =>
-            {
-                console.log('preload call: homeDir', sessionUid)
-                return ipcRenderer.invoke('ssh:home-dir', sessionUid)
-            },
+                ipcRenderer.invoke('ssh:home-dir', sessionUid),
 
             /**
              * Lists the contents of a directory on the remote server.

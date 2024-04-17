@@ -123,7 +123,7 @@ body {
 .round-right-5 { border-radius: 0 5px 5px 0; }
 .round-5 { border-radius: 5px; }
 
-.h-max-500 { max-height: 500px; }
+.h-max-500 { max-height: 500px; overflow: auto; }
 
 /**
  * Border styles
@@ -157,9 +157,10 @@ body {
 }
 
 .file-container {
+    max-height: 100%;
     overflow: auto;
     min-height: 0;
-    flex-shrink: 1;
+    flex-shrink: 0;
 }
 
 .file-container file-element {
@@ -167,6 +168,7 @@ body {
     display: flex;
     align-items: center;
     width: 100%;
+    min-width: max-content;
     box-sizing: border-box;
     flex-flow: row nowrap;
     height: var(--file-element-height);
@@ -195,6 +197,8 @@ file-element[file-type="compressed"] .file-thumbnail { background-image: url('..
     background-color: var(--input-hover-bg);
     cursor: pointer;
 }
+
+.terminal { min-height: 200px; flex-grow: 0; }
 
 .file-container file-element:hover {
     background-color: var(--input-hover-bg);
@@ -227,6 +231,7 @@ file-element[file-type="compressed"] .file-thumbnail { background-image: url('..
 .action-back { background-image: url('../resources/icons/arrow_left.png'); }
 .action-forward { background-image: url('../resources/icons/arrow_right.png'); }
 .action-search { background-image: url('../resources/icons/search.svg'); }
+.action-home { background-image: url('../resources/icons/home.svg'); }
 
 .view-mode-icons { background-image: url('../resources/icons/viewmode_icons.png');}
 .view-mode-rows { background-image: url('../resources/icons/viewmode_list.png'); }
@@ -286,7 +291,7 @@ session-element {
     font-family: var(--font-barlow);
     font-size: calc(0.5 * var(--session-element-height) - 2px);
     line-height: var(--session-element-height);
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease-in-out;
     user-select: none;
 }
 session-element:hover {
@@ -297,6 +302,7 @@ session-element:hover {
 session-element[selected] { border: 1px solid var(--text-color-2); }
 session-element[inactive] { background-color: var(--input-inactive-bg); }
 session-element[connected] { background-color: var(--input-active-bg); }
+session-element[hidden]  { height: 0; min-height: 0; border: none; outline: none; color: transparent; }
 
 .connection-status { visibility: hidden; }
 session-element[connecting] .connection-status { visibility: visible; }
@@ -398,4 +404,32 @@ circular-loader {
 
 .add-session-input-container { width: calc(100% - 40px); }
 
-.terminal { min-height: 200px; flex-grow: 0;}
+
+#line-number-container {
+    width: max-content;
+    min-width: 40px;
+    counter-reset: line;
+}
+
+#file-editor-container {
+    width: max-content;
+    overflow: auto;
+}
+
+.line-content {
+    white-space: pre;
+}
+
+.line-number::after {
+    counter-increment: line;
+    content: '' counter(line);
+    display: block;
+}
+
+.line-number {
+    display: block;
+    min-width: 1px;
+    padding: 0 10px;
+    color: var(--text-color-2);
+    font-size: 0.8em;
+}

@@ -25,17 +25,17 @@ export function createElement(type: string, classes: string[], children: HTMLEle
     [ key: string ]: string
 } = {}): HTMLElement
 {
-    let element = document.createElement( type );
+    let element = document.createElement(type);
     if ( classes.length > 0 )
-        element.classList.add( ...classes );
+        element.classList.add(...classes);
 
-    Object.keys( attributes )
-        .forEach( key => element.setAttribute( key, attributes[ key ] ) );
+    Object.keys(attributes)
+        .forEach(key => element.setAttribute(key, attributes[ key ]));
 
-    Object.keys( properties )
-        .forEach( key => element[ key ] = properties[ key ] );
+    Object.keys(properties)
+        .forEach(key => element[ key ] = properties[ key ]);
 
-    children.forEach( child => element.appendChild( child ) );
+    children.forEach(child => element.appendChild(child));
 
     return element;
 }
@@ -51,22 +51,22 @@ export function createElement(type: string, classes: string[], children: HTMLEle
 export function attachFutureListener(elementId: string, eventType: string, listener: EventListener)
 {
     // If the element already exists, attach the event listener
-    let reference = document.getElementById( elementId );
+    let reference = document.getElementById(elementId);
     if ( reference )
     {
-        reference.addEventListener( eventType, listener );
+        reference.addEventListener(eventType, listener);
         return;
     }
     // If the element doesn't have any event listeners queued, create a new map
-    if ( !__queuedEventListeners.has( elementId ) )
-        __queuedEventListeners.set( elementId, new Map() );
+    if ( !__queuedEventListeners.has(elementId) )
+        __queuedEventListeners.set(elementId, new Map());
 
     // If the element doesn't have any listeners for the specified event type, create a new array
-    let eventListeners = __queuedEventListeners.get( elementId );
-    if ( !eventListeners.has( eventType ) )
-        eventListeners.set( eventType, [] );
+    let eventListeners = __queuedEventListeners.get(elementId);
+    if ( !eventListeners.has(eventType) )
+        eventListeners.set(eventType, []);
 
-    eventListeners.get( eventType ).push( listener );
+    eventListeners.get(eventType).push(listener);
 }
 
 /**
@@ -77,18 +77,18 @@ export function attachFutureListener(elementId: string, eventType: string, liste
  */
 export function appendTo(targetElement: HTMLElement, ...elements: HTMLElement[])
 {
-    elements.forEach( element => targetElement.appendChild( element ) );
+    elements.forEach(element => targetElement.appendChild(element));
 
-    __queuedEventListeners.forEach( (eventListeners, elementId) =>
+    __queuedEventListeners.forEach((eventListeners, elementId) =>
     {
-        let targetElement = document.getElementById( elementId );
+        let targetElement = document.getElementById(elementId);
         if ( !targetElement )
             return;
         // Attach the event listeners to the target element
-        eventListeners.forEach( (listeners, eventType) =>
+        eventListeners.forEach((listeners, eventType) =>
         {
-            listeners.forEach( listener => targetElement.addEventListener( eventType, listener ) )
-            __queuedEventListeners.delete( elementId ); // Remove the event listeners from the queue
-        } )
-    } )
+            listeners.forEach(listener => targetElement.addEventListener(eventType, listener))
+            __queuedEventListeners.delete(elementId); // Remove the event listeners from the queue
+        })
+    })
 }

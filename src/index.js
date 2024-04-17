@@ -18,7 +18,7 @@ require('./util/io/ssh')(ipcMain, app);
 /** @type {Electron.BrowserWindow} */
 let mainWindow = null;
 
-const APP_DIRECTORY = path.join(app.getPath('appData'), 'SSH-FTP');
+const APP_DIRECTORY = path.join(app.getPath('appData'), app.getName());
 
 app.whenReady().then(_ => {
     let indexPath = path.join(__dirname, 'index.html');

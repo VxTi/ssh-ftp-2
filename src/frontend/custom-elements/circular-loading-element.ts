@@ -3,7 +3,10 @@ export class CircularLoadingElement extends HTMLElement
     /**
      * Constructor for the circular loading element.
      */
-    constructor() { super(); }
+    constructor()
+    {
+        super();
+    }
 
     /**
      * Handler for when the element is connected to the DOM.
@@ -17,7 +20,7 @@ export class CircularLoadingElement extends HTMLElement
         {
             let rotorElement = document.createElement('div');
             rotorElement.classList.add('circular-loader-rotor');
-            rotorElement.style.animationDelay = `${i * 0.125 }s`;
+            rotorElement.style.animationDelay = `${i * 0.125}s`;
             rotorElement.style.transform = `rotate(${360 / 8 * i}deg) translateX(70%) `;
             containerElement.appendChild(rotorElement);
         }

@@ -2,13 +2,13 @@
  * Theme: Bright
  */
 
-:root {
-    --primary-bg: #d1dff6;
-    --secondary-bg: #eeeeee;
-    --input-hover-bg: #a4acc1;
-    --input-inactive-bg: #11121c;
-    --input-static-bg: #c1c8e3;
-    --input-active-bg: #76a3ff;
+:root[theme="bright"] {
+    --primary-bg: #ffffff;
+    --secondary-bg: #e4e4e4;
+    --input-hover-bg: #bfcae7;
+    --input-inactive-bg: #747aad;
+    --input-static-bg: #ced7ff;
+    --input-active-bg: #80a7f7;
     --input-border-bg: #323850;
     --border-1: #000;
     --border-2: #343840;

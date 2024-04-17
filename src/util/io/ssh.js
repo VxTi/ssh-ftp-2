@@ -5,7 +5,7 @@
 
 const { NodeSSH } = require('node-ssh');
 const path = require('path');
-const fs = require('fs/promises');
+const fs = require('fs');
 
 /**
  * Map containing all registered SSH sessions
@@ -32,9 +32,13 @@ const activeSessions = new Map();
  */
 function __init(ipcMain, app)
 {
-    const sessionsFilePath = path.join(app.getPath('appData'), 'SSH-FTP', 'sessions.json');
+    const sessionsFilePath = path.join(app.getPath('appData'), app.getName(), 'sessions.json');
 
-    console.log("Event handlers for SSH connections initialized.");
+    // Ensure the existence of the session file.
+    if ( !fs.existsSync(sessionsFilePath) )
+        fs.writeFileSync(sessionsFilePath, '[]');
+
+    console.log("Registered event handlers for SSH functionality.");
 
     function genUid()
     {
@@ -50,9 +54,11 @@ function __init(ipcMain, app)
     {
         session.sessionUid = genUid();
         sessionMap.set(session.sessionUid, session);
+        const newData = JSON.stringify(Array.from(sessionMap.values()));
+        console.log(newData);
         // Schedule microtask
         Promise.resolve()
-            .then(() => fs.writeFile(sessionsFilePath, JSON.stringify(Array.from(sessionMap.entries()))));
+            .then(() => fs.promises.writeFile(sessionsFilePath, newData));
     });
 
     /**
@@ -61,12 +67,12 @@ function __init(ipcMain, app)
      */
     ipcMain.handle('ssh:remove-session', (_, sessionUid) =>
     {
-        if ( sessionMap.contains(sessionUid) )
+        if ( sessionMap.has(sessionUid) )
         {
             sessionMap.delete(sessionUid);
             // Schedule microtask
             Promise.resolve()
-                .then(() => fs.writeFile(sessionsFilePath, JSON.stringify(Array.from(sessionMap.entries()))));
+                .then(() => fs.promises.writeFile(sessionsFilePath, JSON.stringify(Array.from(sessionMap.values()))));
         }
     });
 
@@ -91,23 +97,40 @@ function __init(ipcMain, app)
         if ( !Array.isArray(sessionData) || typeof sessionData[0] != 'object' )
             return [];
 
+        let [ modifications, removals ] = [ 0, 0 ];
+
         for ( let i = sessionData.length - 1; i >= 0; i-- )
         {
             let session = sessionData[i];
             // Check if the session has a sessionUid property.
-            if ( !session.hasOwnProperty('sessionUid') )
-                session.sessionUid = genUid();
-
-            // Check if the session has a host property.
-            if ( !session.hasOwnProperty('host') || typeof session.host !== 'string' )
+            if ( !session.hasOwnProperty('sessionUid') || typeof session.sessionUid !== 'string' )
             {
-                sessionData.splice(i, 1);
-                continue;
+                session.sessionUid = genUid();
+                modifications++;
             }
 
-            // Check if the session has a username property.
-            if ( !session.hasOwnProperty('username') || typeof session.username !== 'string' )
+            // Check if the session has a port property.
+            if ( !session.hasOwnProperty('port') || typeof session.port !== 'number' )
+            {
+                session.port = 22;
+                modifications++;
+            }
+
+            // Check if the session has a host and password property.
+            if ( ( !session.hasOwnProperty('host') || typeof session.host !== 'string') ||
+                 ( !session.hasOwnProperty('username') || typeof session.username !== 'string') )
+            {
                 sessionData.splice(i, 1);
+                removals++;
+            }
+        }
+
+        // If any modifications are made to the file whilst validating,
+        // write the new data to the file.
+        if ( modifications > 0 || removals > 0 )
+        {
+            fs.promises.writeFile(sessionsFilePath, JSON.stringify(sessionData))
+                .then(() => console.log(`Removed ${removals} and modified ${modifications} session(s) in the sessions file.`));
         }
         return sessionData;
     }
@@ -117,7 +140,7 @@ function __init(ipcMain, app)
      */
     ipcMain.handle('ssh:load-sessions', async _ =>
     {
-        return fs.readFile(sessionsFilePath, { encoding: 'utf-8' })
+        return fs.promises.readFile(sessionsFilePath, { encoding: 'utf-8' })
             .then(data =>
             {
                 // Parse the data and return the session entries,
@@ -141,12 +164,13 @@ function __init(ipcMain, app)
         return activeSessions.get(sessionUid)
             /* Name Type Permissions(rwx) size(bytes) Modified(seconds) Created(seconds) */
             .ssh.execCommand(`stat -c "%n\n%F\n%A\n%s\n%Y\n%X" ${filePath}`)
-            .then(result => {
+            .then(result =>
+            {
                 let segments = result.stdout.split('\n');
                 return {
                     name: segments[0],
                     path: filePath,
-                    type: segments[1],
+                    type: segments[1] === 'directory' ? 'directory' : filePath.split('.').pop(),
                     permissions: segments[2],
                     size: parseInt(segments[3]),
                     modified: parseInt(segments[4]),
@@ -189,7 +213,8 @@ function __init(ipcMain, app)
             console.log("Connected to session ", sessionUid);
             event.sender.send('ssh:connected', sessionUid);
             client.requestShell()
-                .then(stream => {
+                .then(stream =>
+                {
                     stream.on('data', data => onData(data.toString()));
                     stream.stderr.on('data', data => onData(data.toString()));
 
@@ -213,22 +238,25 @@ function __init(ipcMain, app)
     /**
      * Event handler for sending data to an SSH session.
      */
-    ipcMain.handle('ssh:send', (_, sessionUid, data) =>
+    ipcMain.handle('ssh:exec', (_, sessionUid, data) =>
     {
         if ( isConnected(sessionUid) )
-            return activeSessions.get(sessionUid).ssh.execCommand(data);
+            return Promise.resolve(activeSessions.get(sessionUid).ssh.execCommand(data)
+                .then(result => result.stdout));
         return Promise.reject('Session not connected.');
     })
 
     /**
      * Event handler for uploading files to an SSH session.
      */
-    ipcMain.handle('ssh:upload-files', (event, sessionUid, localFiles, remotePath) => {
+    ipcMain.handle('ssh:upload-files', (event, sessionUid, localFiles, remotePath) =>
+    {
         if ( !isConnected(sessionUid) )
             return Promise.reject('Session not connected.');
 
-        return activeSessions.get(sessionUid).ssh.putFiles(localFiles.map(file => {
-            return { local: file, remote: remotePath};
+        return activeSessions.get(sessionUid).ssh.putFiles(localFiles.map(file =>
+        {
+            return { local: file, remote: remotePath };
         }), {
             concurrency: 10,
             transferOptions: {
@@ -249,7 +277,8 @@ function __init(ipcMain, app)
         if ( !isConnected(sessionUid) )
             return Promise.reject('Session not connected.');
 
-        return Promise.all(remoteFiles.map(remoteFilePath => {
+        return Promise.all(remoteFiles.map(remoteFilePath =>
+        {
             let fileName = path.basename(remoteFilePath);
             return activeSessions.get(sessionUid).ssh.getFile(path.join(localPath, fileName), remoteFilePath, null, {
                 step: (bytesTransferred, _, totalBytes) =>
@@ -261,7 +290,8 @@ function __init(ipcMain, app)
     /**
      * Event handler for listing files in a directory on an SSH session.
      */
-    ipcMain.handle('ssh:list-files', (_, sessionUid, remotePath) => {
+    ipcMain.handle('ssh:list-files', (_, sessionUid, remotePath) =>
+    {
         if ( !isConnected(sessionUid) )
             return Promise.reject('Session not connected.');
 
@@ -272,7 +302,8 @@ function __init(ipcMain, app)
     /**
      * Event handler for getting the home directory of the user on an SSH session.
      */
-    ipcMain.handle('ssh:home-dir', async (_, sessionUid) => {
+    ipcMain.handle('ssh:home-dir', async (_, sessionUid) =>
+    {
         if ( !isConnected(sessionUid) )
             throw new Error('Session not connected.');
 
@@ -283,7 +314,8 @@ function __init(ipcMain, app)
     /**
      * Event handler for deleting a file on an SSH session.
      */
-    ipcMain.handle('ssh:delete-files', (event, sessionUid, remotePaths) => {
+    ipcMain.handle('ssh:delete-files', (event, sessionUid, remotePaths) =>
+    {
         if ( !isConnected(sessionUid) )
             return Promise.reject('Session not connected.');
         let currentConnection = activeSessions.get(sessionUid).ssh;
@@ -294,7 +326,8 @@ function __init(ipcMain, app)
     /**
      * Event handler for moving a file
      */
-    ipcMain.handle('ssh:move-file', (event, sessionUid, source, destination) => {
+    ipcMain.handle('ssh:move-file', (event, sessionUid, source, destination) =>
+    {
         if ( !isConnected(sessionUid) )
             return Promise.reject('Session not connected.');
         return activeSessions.get(sessionUid).ssh.execCommand(`mv ${source} ${destination}`);

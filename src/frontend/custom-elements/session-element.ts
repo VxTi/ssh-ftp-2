@@ -14,27 +14,28 @@ export class SessionElement extends HTMLElement
     connectedCallback()
     {
         this.innerHTML = `
-            <span>${ this.getAttribute( 'username' || 'user' ) }</span>
-            <span>${ this.getAttribute( 'host' ) || 'host' }</span>
-            <span>${ this.getAttribute( 'port' ) || '22' }</span>
+            <span>${this.getAttribute('username' || 'user')}</span>
+            <span>${this.getAttribute('host') || 'host'}</span>
+            <span>${this.getAttribute('port') || '22'}</span>
             <circular-loader class="connection-status"></circular-loader>
             <span class="session-connect-arrow icon"></span>
         `
-        this.addEventListener( 'dblclick', _ =>
+        this.addEventListener('dblclick', _ =>
         {
-            if ( !this.hasAttribute( 'sessionUid' ) ||
-                this.hasAttribute( 'inactive' ) ||
-                this.hasAttribute( 'connected' ) )
+            if ( !this.hasAttribute('sessionUid') ||
+                this.hasAttribute('inactive') ||
+                this.hasAttribute('connected') )
                 return;
+            document.querySelectorAll('session-element[connected]')
+                .forEach(element => element.removeAttribute('connected'));
+            this.setAttribute('connecting', '');
+            console.log("Connecting to session: ", this.getAttribute('sessionUid'));
+            window[ 'app' ][ 'sessions' ].connect(this.getAttribute('sessionUid'));
 
-            this.setAttribute( 'connecting', '' );
-            console.log( "Connecting to session: ", this.getAttribute( 'sessionUid' ) );
-            window[ 'app' ][ 'sessions' ].connect( this.getAttribute( 'sessionUid' ) );
-
-        } );
-        this.addEventListener( 'click', _ =>
-            this.setAttribute( 'selected', '' ) );
+        });
+        this.addEventListener('click', _ =>
+            this.setAttribute('selected', ''));
     }
 }
 
-customElements.define( 'session-element', SessionElement );
+customElements.define('session-element', SessionElement);

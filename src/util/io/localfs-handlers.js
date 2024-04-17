@@ -1,3 +1,5 @@
+const path = require("node:path");
+const { app } = require("electron");
 
 /**
  * Function for handling local file system
@@ -11,7 +13,13 @@ function __init(ipcMain)
     let path = require('path');
     let fs = require('fs');
 
-    console.log("Registered LocalFS handlers.");
+    const appDirectory = path.join(app.getPath('appData'), app.getName());
+    if (!fs.existsSync(appDirectory))
+    {
+        fs.mkdirSync(appDirectory);
+        console.log("Creating app directory at: " + appDirectory)
+    }
+    console.log("Registered event handlers for local file system.");
 
     /** Read the contents of a file at the given path. */
     ipcMain.handle('localfs:read', async (event, filePath) =>
@@ -21,13 +29,14 @@ function __init(ipcMain)
     ipcMain.handle('localfs:info', async (event, filePath) =>
     {
         let fileStats = fs.lstatSync(filePath);
+        let fileName = path.basename(filePath);
         return {
             permissions: fileStats.mode,
             size: fileStats.size,
             dateCreated: fileStats.ctime,
             dateModified: fileStats.mtime,
-            name: path.basename(filePath),
-            hidden: path.basename(filePath).startsWith('.'),
+            name: fileName,
+            hidden: fileName.startsWith('.'),
             type: fileStats.isDirectory() ? 'directory' : 'file',
             path: filePath,
             isDirectory: fileStats.isDirectory(),
@@ -56,8 +65,8 @@ function __init(ipcMain)
         fs.promises.mkdir(dirPath));
 
     /** Check if a file exists at the given path. */
-    ipcMain.handle('localfs:exists', (_, filePath) =>
-        fs.existsSync(filePath));
+    ipcMain.on('localfs:exists', (event, filePath) =>
+        event.returnValue = fs.existsSync(filePath));
 }
 
 module.exports = __init;

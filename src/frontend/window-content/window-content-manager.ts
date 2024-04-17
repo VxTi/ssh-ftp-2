@@ -11,18 +11,20 @@ import { createElement } from "../util/element-assembler";
 export function setContentDefault()
 {
     // The element to clear
-    let container = document.getElementById( 'inner-content' );
+    let container = document.getElementById('inner-content');
 
     container.appendChild(
-        createElement( 'div', [ 'container', 'align-horizontal', 'main-center', 'cross-center', 'grow-1' ], [
-            createElement('span', [ 'icon', 'icon-logo' ], [], { style: {
-                backgroundImage: `url(./assets/icons/${ window[ 'app' ].icon })`
-                } } ),
+        createElement('div', [ 'container', 'align-horizontal', 'main-center', 'cross-center', 'grow-1' ], [
+            createElement('span', [ 'icon', 'icon-logo' ], [], {
+                style: {
+                    backgroundImage: `url(./assets/icons/${window[ 'app' ].icon})`
+                }
+            }),
             createElement('div', [ 'container', 'align-vertical', 'main-center', 'cross-center' ], [
-                createElement( 'h1', ['text-color-secondary'], [], { textContent: `Welcome to ${ window[ 'app' ].name }.` } ),
-                createElement( 'span', ['text-color-secondary'], [], { innerHTML: 'To get started, add a session on the left, and join<br>it by double-clicking it.' } )
+                createElement('h1', [ 'text-color-secondary' ], [], { textContent: `Welcome to ${window[ 'app' ].name}.` }),
+                createElement('span', [ 'text-color-secondary' ], [], { innerHTML: 'To get started, add a session on the left, and join<br>it by double-clicking it.' })
             ])
-        ], { id: 'default-content' } )
+        ], { id: 'default-content' })
     );
 }
 
@@ -32,11 +34,11 @@ export function setContentDefault()
  */
 export function clearWindowContent(containerId: string)
 {
-    let container = document.getElementById( containerId );
+    let container = document.getElementById(containerId);
     if ( !container )
     {
-        console.error( 'Error whilst attempting to clear container:' );
-        console.error( `Container with ID ${ containerId } not found.` );
+        console.error('Error whilst attempting to clear container:');
+        console.error(`Container with ID ${containerId} not found.`);
         return;
     }
     container.innerHTML = '';

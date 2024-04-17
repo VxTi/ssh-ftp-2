@@ -2,7 +2,8 @@
  * Implementation of the file-element custom element.
  */
 
-export class FileElement extends HTMLElement {
+export class FileElement extends HTMLElement
+{
 
     constructor()
     {

@@ -4,6 +4,7 @@
  * are required for an abstract file system.
  */
 import { IFileInfo } from "./file-info";
+import { AbstractFile } from "./abstract-file";
 
 export interface AbstractFileSystem
 {
@@ -11,7 +12,7 @@ export interface AbstractFileSystem
      * Method to get the file list.
      * @param path The path to get the file list from.
      */
-    listFiles(path: string): Promise<string[]>;
+    listFiles(path: string): Promise<AbstractFile[]>;
 
     /**
      * Method to get the file content.
