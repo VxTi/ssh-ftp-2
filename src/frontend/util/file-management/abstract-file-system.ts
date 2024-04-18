@@ -8,6 +8,13 @@ import { AbstractFile } from "./abstract-file";
 
 export interface AbstractFileSystem
 {
+
+    /**
+     * The current working directory of the file system.
+     */
+    cwd: string;
+
+
     /**
      * Method to get the file list.
      * @param path The path to get the file list from.
@@ -53,5 +60,5 @@ export interface AbstractFileSystem
      * of the file system.
      * @returns The home directory.
      */
-    homeDirectory(): Promise<string>;
+    homeDirectory(): Promise<string> | string;
 }

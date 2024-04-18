@@ -3,8 +3,7 @@
  */
 
 
-import { clearWindowContent } from "./window-content-manager";
-import { assembleSessionList } from "./sidebar-view-sessions";
+import { clearWindowContent, showContent } from "./window-content-manager";
 import {
     appendTo,
     attachFutureListener,
@@ -13,18 +12,18 @@ import {
     createElement
 } from "../util/element-assembler";
 import { RemoteSession } from "../sessions/remote-session";
+import { FrameState } from "../util/frame-state";
 
 /**
  * Function to assemble the add session menu.
  * This function will be called when the user clicks the add session button.
  */
-export function assembleAddSessionMenu()
+export function assembleAddSessionMenu(frameContext: FrameState)
 {
-    clearWindowContent('side-container');
+    /** Event listener for when the user clicks the cancel button. */
+    attachFutureListener('action-cancel-session', 'click', _ =>
+        showContent('sessions-list', { container: frameContext.container }));
 
-    let container = document.getElementById('side-container');
-
-    attachFutureListener('action-cancel-session', 'click', _ => assembleSessionList());
     attachFutureListener('session-show-password', 'click', event =>
     {
         let passwordInput = document.getElementById('session-password');
@@ -61,11 +60,11 @@ export function assembleAddSessionMenu()
         let sessionObj: RemoteSession = sessionPreObj as RemoteSession;
 
         window[ 'app' ][ 'sessions' ].add(sessionObj)
-            .then(() => assembleSessionList());
+            .then(() => showContent('sessions-list', { container: frameContext.container }));
 
     });
 
-    appendTo(container,
+    appendTo(frameContext.container,
         /* Action container */
         createElement('div', [ ...CONTAINER_LEFT_RIGHT, 'nowrap', 'grow-1', 'sidebar-action-container' ], [
             /* Cancel add session */

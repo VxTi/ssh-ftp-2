@@ -7,11 +7,18 @@ export class RemoteFileSystem implements AbstractFileSystem
 {
 
     readonly sessionUid: string;
+
+    cwd: string;
+
     private static readonly fileListExpr: RegExp = /([-drwx+@]+)\s+(\d+)\s+([a-zA-Z0-9._-]+)\s+([a-zA-Z0-9._-]+)\s+(\d+)\s+(\w{3})\s+(\d{1,2})\s+(\d{1,2}:\d{1,2}|\d{4})\s+(.+)/
 
-    constructor(sessionUid: string)
+    constructor(sessionUid: string, cwd?: string)
     {
         this.sessionUid = sessionUid;
+        if ( cwd )
+            this.cwd = cwd;
+        else this.homeDirectory()
+            .then(dir => this.cwd = dir);
     }
 
     /**

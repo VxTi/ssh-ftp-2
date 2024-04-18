@@ -1,4 +1,4 @@
-import { clearWindowContent } from "./window-content-manager";
+import { showContent } from "./window-content-manager";
 import {
     appendTo,
     attachFutureListener,
@@ -8,14 +8,24 @@ import {
     CONTAINER_TOP_BOTTOM,
     createElement
 } from "../util/element-assembler";
+import { FrameState } from "../util/frame-state";
+import { AbstractFileSystem } from "../util/file-management/abstract-file-system";
+import { AbstractFile } from "../util/file-management/abstract-file";
+import { LocalFileSystem } from "../util/file-management/local-file-system";
+import { RemoteFileSystem } from "../util/file-management/remote-file-system";
+import { notify } from "./notification";
+
+/**
+ * File system instances for the local and remote file systems.
+ */
+let localFileSystem: AbstractFileSystem = null;
+let remoteFileSystem: AbstractFileSystem = null;
 
 /**
  * Function for generating the file viewer.
  */
-export function assembleFileViewer()
+export function assembleFileViewer(frameContext: FrameState)
 {
-    clearWindowContent('inner-content');
-
     /*
      * Attach event listeners to the action buttons.
      * These will dispatch custom events to the window object in
@@ -23,12 +33,10 @@ export function assembleFileViewer()
      */
     [ 'back', 'forward', 'view-icons', 'view-rows', 'add-file', 'refresh', 'delete-file', 'home' ]
         .forEach(action =>
-            attachFutureListener(`action-${action}`, 'click', _ =>
-                window.dispatchEvent(new CustomEvent('file-viewer-action-interact', { detail: action }))));
+            attachFutureListener(`action-${action}`, 'click', _ => handleActionEvent(action)));
 
-    // TODO - Fix the file content containers to be scrollable and not overflow.
 
-    appendTo(document.getElementById('inner-content'),
+    appendTo(frameContext.container,
         /* Action container */
         createElement('div', [ 'container', 'align-horizontal', 'main-space-between', 'cross-start', 'border-bottom', 'bg-secondary' ], [
             /* Navigation actions */
@@ -41,7 +49,7 @@ export function assembleFileViewer()
             ]),
             /* File actions */
             createElement('div', CONTAINER_RIGHT_LEFT, [
-                /* View mode container */
+                    /* View mode container */
                     createElement('div', [ ...CONTAINER_HORIZONTAL_CENTER, 'view-mode-container' ], [
                         /* View mode icons */
                         createElement('span', [ 'action', 'view-mode-icons' ], [], {
@@ -60,7 +68,7 @@ export function assembleFileViewer()
                         title: 'Refresh',
                         id: 'action-refresh'
                     }),
-                    createElement('span', [ 'action', 'action-home'], [], {
+                    createElement('span', [ 'action', 'action-home' ], [], {
                         id: 'action-home',
                         title: 'Go to home directory'
                     }),
@@ -79,7 +87,7 @@ export function assembleFileViewer()
                 createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'full-width', 'file-container' ], [], { id: 'localfs' }),
             ]),
 
-            createElement('div', [...CONTAINER_TOP_BOTTOM, 'file-pre-container'], [
+            createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'file-pre-container' ], [
                 /* Remote file system container */
                 createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'full-width', 'file-container' ], [], { id: 'remotefs' })
             ])
@@ -97,4 +105,159 @@ export function assembleFileViewer()
     );
     document.querySelectorAll('.terminal-tab')
         .forEach((tab: HTMLElement) => tab.innerText = 'Terminal')
+
+    if ( localFileSystem !== null && remoteFileSystem !== null )
+    {
+        console.warn("Navigating to paths upon creation")
+        navigateTo(frameContext.parameters[ 'localCwd' ], localFileSystem, document.getElementById('localfs'));
+        navigateTo(frameContext.parameters[ 'remoteCwd' ], remoteFileSystem, document.getElementById('remotefs'));
+    }
+}
+
+/**
+ * Function for navigating through a file system.
+ */
+export function navigateTo(path: string, fileSystem: AbstractFileSystem, targetElement: HTMLElement)
+{
+    if ( !path || typeof path !== 'string' || !fileSystem || !targetElement )
+        throw new Error("'loadFiles' was called with invalid parameters.");
+
+    console.log('Navigating to path:', path, 'on file system:', fileSystem instanceof RemoteFileSystem ? 'remote' : 'local');
+
+    fileSystem.cwd = path;
+    targetElement.innerHTML = '';
+
+    let prevDirFile = createElement('file-element', [], [], {}, {
+        name: '..', path: path, 'file-type': 'directory',
+    });
+    appendTo(targetElement, prevDirFile);
+    prevDirFile.addEventListener('click', (event: MouseEvent) =>
+    {
+        let pathParts = path.split('/');
+        pathParts.pop();
+        let newPath = pathParts.join('/') || '/';
+        if ( newPath !== path )
+            navigateTo(newPath, fileSystem, targetElement);
+    });
+
+    // List all files in the provided path
+    // on the provided file system and show them on the page.
+    fileSystem
+        .listFiles(path)
+        .then((files: AbstractFile[]) => files.filter(file => !file.info?.hidden))
+        .then(files => files.forEach(file =>
+            createFileElement(file, targetElement, path, fileSystem)))
+        .catch(error =>
+        {
+            console.error('Error whilst attempting to list files:', error);
+            targetElement.innerHTML = '';
+        });
+}
+
+/**
+ * Function for creating a file element.
+ */
+function createFileElement(file: AbstractFile, targetElement: HTMLElement, path: string, fileSystem: AbstractFileSystem)
+{
+    console.trace();
+    console.log('Creating file element:', file.name, 'at path:', path, 'on file system:', fileSystem instanceof RemoteFileSystem ? 'remote' : 'local');
+    let newElement = createElement('file-element', [], [], {}, {
+        name: file.name,
+        path: file.path,
+        'file-type': file.type
+    })
+    appendTo(targetElement, newElement);
+    newElement.addEventListener('click', (event: MouseEvent) =>
+    {
+        let nextPath = window[ 'app' ][ 'path' ].join(path, file.name);
+
+        if ( file.info.isDirectory )
+            navigateTo(nextPath, fileSystem, targetElement);
+        else
+        {
+            fileSystem.readFile(nextPath)
+                .then(content =>
+                    {
+                        showContent('file-editor', {
+                            parameters: { content: content, fileType: file.type },
+                            container: document.getElementById('inner-content'),
+                            previousWindowId: 'file-viewer',
+                            previousWindowParameters: {
+                                localCwd: localFileSystem.cwd,
+                                remoteCwd: remoteFileSystem.cwd,
+                            }
+                        })
+                    }
+                );
+        }
+    });
+}
+
+/**
+ * Event listener for when a session is connected.
+ * This event is emitted from `./util/ssh.js` when a connection is established.
+ */
+window[ 'app' ].handleEvent('ssh:connected', async (sessionUid: string) =>
+{
+    document.querySelectorAll('session-element').forEach((element: HTMLElement) =>
+    {
+        element.removeAttribute('inactive');
+        element.removeAttribute('connecting');
+        if ( element.getAttribute('sessionUid') === sessionUid )
+            element.setAttribute('connected', '');
+    });
+
+    // Assemble page
+    showContent('file-viewer', {
+        container: document.getElementById('inner-content')
+    });
+
+    localFileSystem = new LocalFileSystem();
+    remoteFileSystem = new RemoteFileSystem(sessionUid);
+
+    let [ localCwd, remoteCwd ] = [
+        await localFileSystem.homeDirectory(),
+        await remoteFileSystem.homeDirectory()
+    ];
+
+    /** Assemble the file system components */
+    navigateTo(localCwd, localFileSystem, document.getElementById('localfs'));
+    navigateTo(remoteCwd, remoteFileSystem, document.getElementById('remotefs'));
+})
+
+/**
+ * Function for handling file viewer actions.
+ * @param action - The action to handle.
+ */
+function handleActionEvent(action: string)
+{
+    console.log('File viewer action:', action);
+    notify('File viewer action:');
+    switch ( action )
+    {
+        case 'back':
+
+            break;
+        case 'forward':
+
+            break;
+        case 'view-icons':
+
+            break;
+        case 'view-rows':
+
+            break;
+        case 'add-file':
+
+            break;
+        case 'refresh':
+
+            break;
+        case 'delete-file':
+
+            break;
+        case 'home':
+
+            break;
+    }
 }

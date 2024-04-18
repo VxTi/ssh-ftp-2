@@ -12,11 +12,15 @@
 export interface FrameState {
 
     /**
-     * The generator function used to create the previous window.
-     * This function can be called when in another window to go back
-     * to the previous one, provided the `previousWindowInitArgs`.
+     * The element that hosts the frame.
      */
-    readonly previousWindowGenerator?: Function;
+    readonly container: HTMLElement;
+
+    /**
+     * The unique ID of the previous window. This must be registered in the content map
+     * in the `window-content-manager.ts` file.
+     */
+    readonly previousWindowId?: string;
 
     /**
      * The properties the previous window was initialized with.
@@ -28,6 +32,6 @@ export interface FrameState {
      * The initialization properties of the current window.
      * This can be used in the generator function for this window.
      */
-    readonly parameters: Object;
+    readonly parameters?: Object;
 
 }

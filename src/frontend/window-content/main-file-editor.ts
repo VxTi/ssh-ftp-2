@@ -5,7 +5,7 @@
  */
 
 
-import { clearWindowContent } from "./window-content-manager";
+import { clearWindowContent, showContent } from "./window-content-manager";
 import {
     appendTo, attachFutureListener,
     CONTAINER_LEFT_RIGHT,
@@ -20,13 +20,17 @@ import { FrameState } from "../util/frame-state";
  */
 export function assembleFileEditor(frameContext: FrameState)
 {
-    clearWindowContent('inner-content'); // Clear previous content
-
     // Generate the previous window.
     attachFutureListener('action-back', 'click', (event: MouseEvent) =>
-        frameContext.previousWindowGenerator(frameContext.previousWindowParameters))
+    {
+        showContent( frameContext.previousWindowId, {
+            container: frameContext.container,
+            parameters: frameContext.previousWindowParameters,
+            previousWindowId: 'file-editor'
+        });
+    })
 
-    appendTo(document.getElementById('inner-content'),
+    appendTo(frameContext.container,
         /** Container for all content */
         createElement('div', [...CONTAINER_TOP_BOTTOM, 'scroll'], [
 

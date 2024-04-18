@@ -5,6 +5,15 @@ import { AbstractFile } from "./abstract-file";
 
 export class LocalFileSystem implements AbstractFileSystem
 {
+
+    // The current working directory of the file system.
+    cwd: string;
+
+    constructor(cwd?: string)
+    {
+        this.cwd = cwd || this.homeDirectory() as string;
+    }
+
     /**
      * Delete a file from the local file system.
      * @param paths - The path to the file to delete.
@@ -70,9 +79,8 @@ export class LocalFileSystem implements AbstractFileSystem
         return Promise.resolve(window[ 'app' ][ 'localFs' ].info(path));
     }
 
-    homeDirectory(): Promise<string>
+    homeDirectory(): Promise<string> | string
     {
         return window[ 'app' ][ 'localFs' ].homeDir
     }
-
 }

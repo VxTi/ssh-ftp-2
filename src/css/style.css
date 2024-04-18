@@ -456,6 +456,7 @@ circular-loader {
     line-height: var(--file-editor-line-height);
     font-size: var(--file-editor-font-size);
     font-family: var(--file-editor-font);
+    min-height: var(--file-editor-line-height);
     white-space: pre;
     color: var(--text-color-2);
 }
@@ -464,4 +465,27 @@ circular-loader {
     display: block;
     min-width: 1px;
     padding: 0 10px;
+}
+
+.notification {
+    --notification-height: 40px;
+    position: absolute;
+    left: 0;
+    top: calc(100vh - var(--notification-height));
+    height: var(--notification-height);
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    line-height: var(--notification-height);
+    width: 100vw;
+    background-color: var(--input-active-bg);
+}
+
+.notification-type-warning {
+    background-color: #ffcc00;
+}
+
+.notification-type-error {
+    background-color: #ff0000;
 }

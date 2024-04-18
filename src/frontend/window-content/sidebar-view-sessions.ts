@@ -1,7 +1,7 @@
 /**
  * @module session-list
  */
-import { clearWindowContent } from "./window-content-manager";
+import { clearWindowContent, showContent } from "./window-content-manager";
 import { RemoteSession } from "../sessions/remote-session";
 import { assembleAddSessionMenu } from "./sidebar-new-session";
 import {
@@ -12,17 +12,20 @@ import {
     CONTAINER_TOP_BOTTOM,
     createElement
 } from "../util/element-assembler";
+import { FrameState } from "../util/frame-state";
 
 /**
  * Function to assemble the session list.
- * @param loadFromStorage Whether to load the session list from the local storage object.
- * Default is false.
+ * @param frameContext The initialization
  */
-export function assembleSessionList()
+export function assembleSessionList(frameContext: FrameState)
 {
-    clearWindowContent('side-container'); // Clear the side container
-
-    attachFutureListener('action-add-session', 'click', assembleAddSessionMenu);
+    // When clicked on the 'Add session' button, show the 'create-session' window
+    attachFutureListener('action-add-session', 'click', () => showContent('create-session', {
+        container: document.getElementById('side-container'),
+        previousWindowId: 'sessions-list',
+        previousWindowParameters: frameContext.parameters
+    }));
     attachFutureListener('action-delete-session', 'click', _ =>
         window.dispatchEvent(new CustomEvent('session:delete')));
     attachFutureListener('action-refresh-sessions', 'click', _ =>
@@ -57,7 +60,7 @@ export function assembleSessionList()
     })
 
     /** Side container content */
-    appendTo(document.getElementById('side-container'),
+    appendTo(frameContext.container,
         /* Action container */
         createElement('div', [ ...CONTAINER_HORIZONTAL_CENTER, 'nowrap', 'grow-1', 'sidebar-action-container' ], [
             /* Actions */
@@ -118,3 +121,35 @@ function loadSessionList(targetContainer: HTMLElement)
             })
         });
 }
+
+/**
+ * Event listener for when a session is deleted.
+ */
+window.addEventListener('session:delete', () =>
+{
+    document.querySelectorAll('session-element[selected]').forEach((element: HTMLElement) =>
+    {
+        window[ 'app' ][ 'sessions' ].delete(element.getAttribute('sessionUid'))
+            .then(() => element.remove());
+    });
+});
+
+
+/**
+ * Event listener for when a session is created.
+ * This event is called from `./util/ssh.js` when one attempts to connect
+ * with it, when calling `window.app.sessions.connect(sessionUid)`
+ */
+window.addEventListener('session:attempt-connect', (event: CustomEvent) =>
+{
+    console.log("Attempting to connect to session with UID: ", event.detail.sessionUid);
+    // Set all session elements to in-active
+    // This is a temporary solution to prevent multiple connections
+    document.querySelectorAll('session-element').forEach((element: HTMLElement) =>
+    {
+        element.setAttribute('inactive', '');
+        element.removeAttribute('connecting');
+        if ( element.getAttribute('sessionUid') === event.detail.sessionUid )
+            element.setAttribute('connecting', '');
+    })
+})
