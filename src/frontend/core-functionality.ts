@@ -2,13 +2,8 @@
  * This file is used to define the core functionality of the application.
  */
 
-import { showContent, registerMainFrames } from "./window-content/window-content-manager";
-import { LocalFileSystem } from "./util/file-management/local-file-system";
-import { RemoteFileSystem } from "./util/file-management/remote-file-system";
-import { AbstractFileSystem } from "./util/file-management/abstract-file-system";
-import { appendTo, createElement } from "./util/element-assembler";
+import { registerMainFrames, showContent } from "./window-content/window-content-manager";
 import { applyTheme, loadThemes } from "./util/theme-manager";
-import { AbstractFile } from "./util/file-management/abstract-file";
 
 document.addEventListener('DOMContentLoaded', _ =>
 {
@@ -32,6 +27,15 @@ document.addEventListener('DOMContentLoaded', _ =>
     registerMainFrames();
     showContent('startup-content', { container: document.getElementById('inner-content') })
     showContent('sessions-list', { container: document.getElementById('side-container') });
+
+    document.getElementById('sidebar-visibility-toggle')
+        .addEventListener('click', _ => {
+            let sidebar = document.getElementById('sidebar-container');
+            if ( sidebar.hasAttribute('expanded'))
+                sidebar.removeAttribute('expanded');
+            else
+                sidebar.setAttribute('expanded', '');
+        })
 });
 
 /**

@@ -5,9 +5,10 @@
  */
 
 
-import { clearWindowContent, showContent } from "./window-content-manager";
+import { showContent } from "./window-content-manager";
 import {
-    appendTo, attachFutureListener,
+    appendTo,
+    attachFutureListener,
     CONTAINER_LEFT_RIGHT,
     CONTAINER_SPREAD_AROUND,
     CONTAINER_TOP_BOTTOM,
@@ -35,7 +36,7 @@ export function assembleFileEditor(frameContext: FrameState)
         createElement('div', [...CONTAINER_TOP_BOTTOM, 'scroll'], [
 
             /* Action container */
-            createElement('div', [ ...CONTAINER_SPREAD_AROUND, 'border-bottom', 'fit-v-content' ], [
+            createElement('div', [ ...CONTAINER_SPREAD_AROUND, 'border-bottom', 'fit-v-content', 'max-width' ], [
                 /** Go back action */
                 createElement('div', [ 'action', 'action-back' ], [], { id: 'action-back' }),
 

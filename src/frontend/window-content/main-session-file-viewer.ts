@@ -22,6 +22,13 @@ let localFileSystem: AbstractFileSystem = null;
 let remoteFileSystem: AbstractFileSystem = null;
 
 /**
+ * The maximum number of items to keep in the window activity history.
+ * If no maximum is set, it might result in a memory leak on long-running applications
+ * or low memory devices.
+ */
+const MAX_WINDOW_ACTIVITY_HISTORY = 25;
+
+/**
  * Function for generating the file viewer.
  */
 export function assembleFileViewer(frameContext: FrameState)
@@ -122,8 +129,6 @@ export function navigateTo(path: string, fileSystem: AbstractFileSystem, targetE
     if ( !path || typeof path !== 'string' || !fileSystem || !targetElement )
         throw new Error("'loadFiles' was called with invalid parameters.");
 
-    console.log('Navigating to path:', path, 'on file system:', fileSystem instanceof RemoteFileSystem ? 'remote' : 'local');
-
     fileSystem.cwd = path;
     targetElement.innerHTML = '';
 
@@ -159,8 +164,6 @@ export function navigateTo(path: string, fileSystem: AbstractFileSystem, targetE
  */
 function createFileElement(file: AbstractFile, targetElement: HTMLElement, path: string, fileSystem: AbstractFileSystem)
 {
-    console.trace();
-    console.log('Creating file element:', file.name, 'at path:', path, 'on file system:', fileSystem instanceof RemoteFileSystem ? 'remote' : 'local');
     let newElement = createElement('file-element', [], [], {}, {
         name: file.name,
         path: file.path,
@@ -231,33 +234,5 @@ window[ 'app' ].handleEvent('ssh:connected', async (sessionUid: string) =>
  */
 function handleActionEvent(action: string)
 {
-    console.log('File viewer action:', action);
-    notify('File viewer action:');
-    switch ( action )
-    {
-        case 'back':
-
-            break;
-        case 'forward':
-
-            break;
-        case 'view-icons':
-
-            break;
-        case 'view-rows':
-
-            break;
-        case 'add-file':
-
-            break;
-        case 'refresh':
-
-            break;
-        case 'delete-file':
-
-            break;
-        case 'home':
-
-            break;
-    }
+    notify(action, 'warning');
 }

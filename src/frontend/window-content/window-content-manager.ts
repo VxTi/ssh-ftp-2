@@ -18,7 +18,7 @@ const registeredContentMap: Map<string, Function> = new Map();
 /**
  * Function for setting the content of the window to the default content.
  */
-export function assembleDefaultContent(frameContext: FrameState)
+function assembleDefaultContent(frameContext: FrameState)
 {
     // The element to clear
     let container = document.getElementById('inner-content');
@@ -79,8 +79,10 @@ export function registerContentFrame(contentFrameId: string, generatorFunction: 
 export function showContent(frameId: string, initParameters: FrameState)
 {
     console.log('`showContent` called with frame ID:', frameId, 'and parameters:', initParameters);
-    window['contentHistory'] = window['contentHistory'] || [];
-    window['contentHistory'].push({ frameId: frameId, parameters: initParameters });
+    window['contentHistory'] = window['contentHistory'] || {};
+    let targetId = initParameters.container.id || 'default';
+    window['contentHistory'][targetId] = window['contentHistory'][targetId] || [];
+    window['contentHistory'][targetId].push({ frameId: frameId, parameters: initParameters });
 
     if ( !registeredContentMap.has(frameId) )
         throw new Error(`Content frame with ID '${frameId}' does not exist.`)

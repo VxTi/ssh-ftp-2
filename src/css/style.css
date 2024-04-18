@@ -22,6 +22,8 @@
     --session-element-height: 30px;
     --input-box-height: 40px;
 
+    --status-bar-height: 30px;
+
     --file-editor-font-size: 13px;
     --file-editor-font: 'JetBrains Mono';
     --file-editor-line-height: calc(var(--file-editor-font-size) * 1.35);
@@ -94,7 +96,13 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    image-rendering: auto;
+    image-rendering: high-quality;
+}
+
+.fit-icon {
+    aspect-ratio: 1;
+    height: 100%;
+    background-size: 65%;
 }
 
 .rect-fit-vertical {
@@ -153,15 +161,19 @@ body {
     transition: width 0.2s, opacity 0.15s;
     flex-shrink: 0;
 }
+#sidebar-container:not([expanded]) { width: 0; opacity: 0; }
 
 #status-bar {
-    height: 30px;
+    height: var(--status-bar-height);
     z-index: 999;
 }
+
+.status-action { width: var(--status-bar-height); height: var(--status-bar-height); background-size: 65% }
+.status-action:hover { background-color: var(--input-hover-bg);}
+
 #content { z-index: 1;}
 
 @media screen and (max-width: 850px) {
-    #sidebar-container:not([expanded]) { width: 0; opacity: 0; }
     #sidebar-container[expanded] { width: 100%; }
     #sidebar-container[expanded] + #inner-content { display: none; }
 }
@@ -260,6 +272,7 @@ file-element[file-type="compressed"] .file-thumbnail { background-image: url('..
 .action-forward { background-image: url('../resources/icons/arrow_right.png'); }
 .action-search { background-image: url('../resources/icons/search.svg'); }
 .action-home { background-image: url('../resources/icons/home.svg'); }
+.action-more { background-image: url('../resources/icons/more.svg'); }
 
 .action-save-file {
     width: max-content;

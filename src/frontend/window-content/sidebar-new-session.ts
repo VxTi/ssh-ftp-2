@@ -3,7 +3,7 @@
  */
 
 
-import { clearWindowContent, showContent } from "./window-content-manager";
+import { showContent } from "./window-content-manager";
 import {
     appendTo,
     attachFutureListener,

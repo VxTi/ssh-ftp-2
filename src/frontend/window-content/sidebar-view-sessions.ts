@@ -1,9 +1,8 @@
 /**
  * @module session-list
  */
-import { clearWindowContent, showContent } from "./window-content-manager";
+import { showContent } from "./window-content-manager";
 import { RemoteSession } from "../sessions/remote-session";
-import { assembleAddSessionMenu } from "./sidebar-new-session";
 import {
     appendTo,
     attachFutureListener,
