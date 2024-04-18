@@ -21,7 +21,7 @@ export class CircularLoadingElement extends HTMLElement
             let rotorElement = document.createElement('div');
             rotorElement.classList.add('circular-loader-rotor');
             rotorElement.style.animationDelay = `${i * 0.125}s`;
-            rotorElement.style.transform = `rotate(${360 / 8 * i}deg) translateX(70%) `;
+            rotorElement.style.transform = `rotate(${360 / 8 * i}deg) translateX(80%) `;
             containerElement.appendChild(rotorElement);
         }
 

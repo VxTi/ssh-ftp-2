@@ -5,7 +5,9 @@ import { AbstractFile } from "./abstract-file";
 
 export class RemoteFileSystem implements AbstractFileSystem
 {
+
     readonly sessionUid: string;
+    private static readonly fileListExpr: RegExp = /([-drwx+@]+)\s+(\d+)\s+([a-zA-Z0-9._-]+)\s+([a-zA-Z0-9._-]+)\s+(\d+)\s+(\w{3})\s+(\d{1,2})\s+(\d{1,2}:\d{1,2}|\d{4})\s+(.+)/
 
     constructor(sessionUid: string)
     {
@@ -54,12 +56,11 @@ export class RemoteFileSystem implements AbstractFileSystem
                     .slice(1)
                     .map(data =>
                     {
-                        let parameters = data.match(/([-drwx]+)\s+(\d+)\s+(\w+)\s+(\w+)\s+(\d+)\s+(\w{3}\s+\d{1,2}\s+\d{1,2}:\d{1,2})\s+(.+)/);
+                        let parameters = data.match(RemoteFileSystem.fileListExpr);
                         if ( !parameters )
-                            throw new Error("Unable to parse file data: " + data);
+                            throw new Error("Unable to parse file data: \n" + data);
 
-                        const [, permissions, links, owner, group, size, date, filename] = parameters;
-
+                        const [, permissions, fileCount, owner, group, size, month, date, yearOrTime, filename] = parameters;
 
                         let fileType = permissions.charAt(0) === 'd' ? 'directory' :
                             filename.indexOf('.') !== -1 ? filename.split('.').pop() : 'file';
@@ -70,7 +71,7 @@ export class RemoteFileSystem implements AbstractFileSystem
                             {
                                 hidden: filename.charAt(0) === '.',
                                 size: parseInt(size),
-                                dateModified: new Date(date).getTime(),
+                                dateModified: Date.parse(`${month} ${date} ${yearOrTime}`),
                                 permissions: permissions,
                                 name: filename,
                                 path: path,

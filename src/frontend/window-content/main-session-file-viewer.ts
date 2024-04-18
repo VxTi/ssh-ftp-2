@@ -72,15 +72,18 @@ export function assembleFileViewer()
             ),
         ]),
         /* File viewer container */
-        createElement('div', [ ...CONTAINER_LEFT_RIGHT, 'grow-1' ], [
+        createElement('div', [ ...CONTAINER_LEFT_RIGHT, 'grow-1', 'scroll' ], [
 
-            createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'grow-1', 'full-width', 'full-height', 'border-right' ], [
+            createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'border-right', 'file-pre-container' ], [
                 /* Local file system container */
                 createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'full-width', 'file-container' ], [], { id: 'localfs' }),
             ]),
 
-            /* Remote file system container */
-            createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'full-height', 'grow-1', 'file-container' ], [], { id: 'remotefs' })
+            createElement('div', [...CONTAINER_TOP_BOTTOM, 'file-pre-container'], [
+                /* Remote file system container */
+                createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'full-width', 'file-container' ], [], { id: 'remotefs' })
+            ])
+
         ]),
         /* Terminal container */
         createElement('div', [ 'container', 'align-vertical', 'main-start', 'border-top', 'terminal' ], [

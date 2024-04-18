@@ -87,7 +87,7 @@ export function assembleSessionList()
         ]),
 
         /* Container with border */
-        createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'holding-container', 'h-max-500' ], [
+        createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'holding-container', 'cross-center', 'h-max-500' ], [
             /* Title */
             createElement('h3', [], [], { textContent: 'Sessions' }),
         ], { id: 'session-list-container' }),

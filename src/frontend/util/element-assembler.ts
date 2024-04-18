@@ -4,11 +4,11 @@
 
 let __queuedEventListeners: Map<string, Map<string, EventListener[]>> = new Map();
 
-export const CONTAINER_TOP_BOTTOM = [ 'container', 'align-vertical', 'main-start', 'cross-center' ];
+export const CONTAINER_TOP_BOTTOM = [ 'container', 'align-vertical', 'main-start' ];
 export const CONTAINER_LEFT_RIGHT = [ 'container', 'align-horizontal', 'main-start', 'cross-start' ];
 export const CONTAINER_RIGHT_LEFT = [ 'container', 'align-horizontal', 'main-end', 'cross-start' ];
 export const CONTAINER_HORIZONTAL_CENTER = [ 'container', 'align-horizontal', 'main-center', 'cross-center' ];
-export const CONTAINER_SPREAD_AROUND = [ 'container', 'align-horizontal', 'main-space-between', 'cross-start' ];
+export const CONTAINER_SPREAD_AROUND = [ 'container', 'align-horizontal', 'main-space-between' ];
 
 /**
  * Creates an HTMLElement with the specified type, properties, attributes, and children.

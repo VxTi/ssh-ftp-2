@@ -10,8 +10,8 @@ import { RemoteFileSystem } from "./util/file-management/remote-file-system";
 import { AbstractFileSystem } from "./util/file-management/abstract-file-system";
 import { appendTo, createElement } from "./util/element-assembler";
 import { applyTheme, getThemes, loadThemes } from "./util/theme-manager";
-import { loadFileInEditor } from "./window-content/main-file-editor";
 import { AbstractFile } from "./util/file-management/abstract-file";
+import { assembleFileEditor } from "./window-content/main-file-editor";
 
 let localFileSystem: AbstractFileSystem;
 let remoteFileSystem: AbstractFileSystem;
@@ -122,7 +122,16 @@ function loadFiles(path: string, targetElement: HTMLElement, fileSystem: Abstrac
                     if ( file.info.isDirectory )
                         loadFiles(nextPath, targetElement, fileSystem);
                     else fileSystem.readFile(nextPath)
-                        .then(content => loadFileInEditor(content, file.type));
+                        .then(content => assembleFileEditor({
+                            parameters: {
+                                content: content,
+                                fileType: file.type
+                            },
+                            previousWindowGenerator: assembleFileViewer,
+                            previousWindowParameters: {
+
+                            }
+                        }));
                 })
             });
         })
@@ -150,8 +159,8 @@ window[ 'app' ].handleEvent('ssh:connected', (sessionUid: string) =>
         remoteFileSystem = new RemoteFileSystem(sessionUid);
         /** Assemble the file system components */
 
-        loadFiles(await remoteFileSystem.homeDirectory(), document.getElementById('remotefs'), remoteFileSystem);
         loadFiles(await localFileSystem.homeDirectory(), document.getElementById('localfs'), localFileSystem);
+        loadFiles(await remoteFileSystem.homeDirectory(), document.getElementById('remotefs'), remoteFileSystem);
     })();
 })
 

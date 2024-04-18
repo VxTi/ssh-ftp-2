@@ -6,52 +6,75 @@
 
 
 import { clearWindowContent } from "./window-content-manager";
-import { appendTo, CONTAINER_LEFT_RIGHT, CONTAINER_TOP_BOTTOM, createElement } from "../util/element-assembler";
+import {
+    appendTo, attachFutureListener,
+    CONTAINER_LEFT_RIGHT,
+    CONTAINER_SPREAD_AROUND,
+    CONTAINER_TOP_BOTTOM,
+    createElement
+} from "../util/element-assembler";
+import { FrameState } from "../util/frame-state";
 
 /**
  * Function that builds the file editor
  */
-export function assembleFileEditor()
+export function assembleFileEditor(frameContext: FrameState)
 {
     clearWindowContent('inner-content'); // Clear previous content
 
-    appendTo(document.getElementById('inner-content'),
-        createElement( 'div', CONTAINER_LEFT_RIGHT, [
-        createElement('div', [...CONTAINER_TOP_BOTTOM, 'border-right'], [], {
-            id: 'line-number-container'
-        }),
-        createElement('div', ['container', 'align-vertical', 'main-start', 'cross-start'], [], {
-            id: 'file-editor-container'
-        })
-    ], [], {
-        id: 'file-editor'
-    }))
-}
+    // Generate the previous window.
+    attachFutureListener('action-back', 'click', (event: MouseEvent) =>
+        frameContext.previousWindowGenerator(frameContext.previousWindowParameters))
 
-/**
- * Function for loading file content into the file editor.
- * If the file editor hasn't been assembled,
- * @param content - The content to load onto the file editor.
- * @param fileExtension - The extension of the file. This is an optional parameter. If left empty,
- * no highlighting will be applied. Only highlights the content if there exists a highlighter.
- */
-export function loadFileInEditor(content: string, fileExtension?: string)
-{
-    // Ensure the file editor exists
-    if ( !document.getElementById('file-editor'))
-        assembleFileEditor();
+    appendTo(document.getElementById('inner-content'),
+        /** Container for all content */
+        createElement('div', [...CONTAINER_TOP_BOTTOM, 'scroll'], [
+
+            /* Action container */
+            createElement('div', [ ...CONTAINER_SPREAD_AROUND, 'border-bottom' ], [
+                /** Go back action */
+                createElement('div', [ 'action', 'action-back' ], [], { id: 'action-back' }),
+
+                /* Container for actions on the right */
+                createElement('div', CONTAINER_LEFT_RIGHT, [
+                    createElement('div', ['action', 'action-save-file'], [], {
+                        innerText: 'Save File',
+                        id: 'action-save-file'
+                    })
+                ])
+            ]),
+            createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'max-height', 'm-height-100', 'm-width-100', 'scroll' ], [
+                createElement('div', [ ...CONTAINER_LEFT_RIGHT, 'file-pre-container' ], [
+                    /* Line number container */
+                    createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'border-right' ], [], {
+                        id: 'line-number-container'
+                    }),
+                    /* Line content container */
+                    createElement('div', CONTAINER_TOP_BOTTOM, [], {
+                        id: 'file-editor-container'
+                    })
+                ], [], { id: 'file-editor' })
+            ])
+        ])
+    )
 
     let lineContainer = document.getElementById('line-number-container');
     let contentContainer = document.getElementById('file-editor-container');
 
-    let lines = content.split('\n');
+    // Check if the provided init arguments have the `content` property
+    if ( frameContext.parameters.hasOwnProperty('content'))
+    {
 
-    lines.forEach((line, index) => {
-        appendTo(lineContainer, createElement( 'div', ['line-number']));
-        appendTo(contentContainer, createElement( 'span', ['line-content'], [], {
-            innerHTML: __formatHtml(line)
-        }))
-    })
+        let lines: string[] = frameContext.parameters[ 'content' ].split('\n');
+
+        lines.forEach(line =>
+        {
+            appendTo(lineContainer, createElement('div', [ 'line-number' ]));
+            appendTo(contentContainer, createElement('span', [ 'line-content' ], [], {
+                innerHTML: __formatHtml(line)
+            }))
+        })
+    }
 }
 
 /**

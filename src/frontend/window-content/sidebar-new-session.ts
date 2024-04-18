@@ -75,7 +75,7 @@ export function assembleAddSessionMenu()
             })
         ]),
         /* Container with border */
-        createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'holding-container' ], [
+        createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'holding-container', 'cross-center' ], [
             /* Title */
             createElement('h3', [], [], { textContent: 'Add Session' }),
             createElement('div', [ 'add-session-input-container', 'container', 'align-horizontal', 'main-start', 'cross-start', 'grow-1' ], [
