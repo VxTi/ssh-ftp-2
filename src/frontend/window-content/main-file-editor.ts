@@ -35,7 +35,7 @@ export function assembleFileEditor(frameContext: FrameState)
         createElement('div', [...CONTAINER_TOP_BOTTOM, 'scroll'], [
 
             /* Action container */
-            createElement('div', [ ...CONTAINER_SPREAD_AROUND, 'border-bottom' ], [
+            createElement('div', [ ...CONTAINER_SPREAD_AROUND, 'border-bottom', 'fit-v-content' ], [
                 /** Go back action */
                 createElement('div', [ 'action', 'action-back' ], [], { id: 'action-back' }),
 

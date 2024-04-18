@@ -66,7 +66,7 @@ export function assembleAddSessionMenu(frameContext: FrameState)
 
     appendTo(frameContext.container,
         /* Action container */
-        createElement('div', [ ...CONTAINER_LEFT_RIGHT, 'nowrap', 'grow-1', 'sidebar-action-container' ], [
+        createElement('div', [ ...CONTAINER_LEFT_RIGHT, 'nowrap', 'grow-1', 'sidebar-action-container', 'fit-v-content' ], [
             /* Cancel add session */
             createElement('div', [ 'action', 'action-cancel' ], [], {
                 id: 'action-cancel-session',

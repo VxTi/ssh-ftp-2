@@ -62,7 +62,7 @@ export function assembleSessionList(frameContext: FrameState)
     /** Side container content */
     appendTo(frameContext.container,
         /* Action container */
-        createElement('div', [ ...CONTAINER_HORIZONTAL_CENTER, 'nowrap', 'grow-1', 'sidebar-action-container' ], [
+        createElement('div', [ ...CONTAINER_HORIZONTAL_CENTER, 'nowrap', 'grow-1', 'sidebar-action-container', 'fit-v-content' ], [
             /* Actions */
 
             /* 'Add Session' container (icon and text) */

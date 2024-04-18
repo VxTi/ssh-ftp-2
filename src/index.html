@@ -1,28 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';"/>
     <title>SSH FTP</title>
     <script src="bundle/app-bundle.js"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="container main-start align-vertical">
-<!-- Content container (L->R) -->
-<div class="content container align-horizontal main-start grow-1" id="content">
+    <!-- Content container (L->R) -->
+    <div class="full-width full-height container align-horizontal main-start grow-1" id="content">
 
-    <!-- Left sidebar (T->B) -->
-    <div class="container align-vertical main-start border-right" id="sidebar-container">
-        <!-- Sessions container -->
-        <div class="container align-vertical main-start cross-center" id="side-container"></div>
+        <!-- Left sidebar (T->B) -->
+        <div class="container align-vertical main-start border-right" id="sidebar-container">
+            <!-- Sessions container -->
+            <div class="container align-vertical main-start cross-center" id="side-container"></div>
+        </div>
+
+        <!-- content container (T->B) -->
+        <!-- Inner content must be generated in JavaScript -->
+        <div class="container align-vertical main-start grow-1 nowrap" id="inner-content"></div>
     </div>
-
-    <!-- content container (T->B) -->
-    <!-- Inner content must be generated in JavaScript -->
-    <div class="container align-vertical main-start grow-1 nowrap" id="inner-content"></div>
-</div>
+    <!-- Status bar -->
+    <div class="container align-horizontal bg-primary border-top main-end cross-center" id="status-bar"></div>
 </body>
 </html>

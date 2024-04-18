@@ -38,7 +38,7 @@ export function assembleFileViewer(frameContext: FrameState)
 
     appendTo(frameContext.container,
         /* Action container */
-        createElement('div', [ 'container', 'align-horizontal', 'main-space-between', 'cross-start', 'border-bottom', 'bg-secondary' ], [
+        createElement('div', [ 'container', 'align-horizontal', 'main-space-between', 'cross-start', 'border-bottom', 'bg-secondary', 'fit-v-content' ], [
             /* Navigation actions */
             createElement('div', CONTAINER_LEFT_RIGHT, [
                 createElement('span', [ 'action', 'action-back' ], [], { title: 'Go back', id: 'action-back' }),

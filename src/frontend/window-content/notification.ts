@@ -21,6 +21,5 @@ export function notify(message: string, type: NotificationType = 'info')
 
     notificationElement.style.top = `${window.innerHeight - previousElements.length * 50}px`;
 
-
     setTimeout(() => notificationElement.remove(), 5000);
 }
