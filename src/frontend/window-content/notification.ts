@@ -11,8 +11,8 @@ let notificationList = [];
  */
 export function notify(message: string, type: NotificationType = 'info')
 {
-    let notificationElement = createElement('div', ['notification', `notification-${type}`], [
-        createElement('span', ['icon', `notification-icon-${type}`]),
+    let notificationElement = createElement('div', [ 'notification', `notification-${type}` ], [
+        createElement('span', [ 'icon', `notification-icon-${type}` ]),
         createElement('span', [], [], { textContent: message })
     ]);
 

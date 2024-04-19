@@ -19,7 +19,7 @@ export const CONTAINER_SPREAD_AROUND = [ 'container', 'align-horizontal', 'main-
  * @param children The children to append to the element.
  * @returns The created HTMLElement.
  */
-export function createElement(type: string, classes: string[], children: HTMLElement[] = [], properties: {
+export function createElement(type: string, classes?: string[], children: HTMLElement[] = [], properties: {
     [ key: string ]: any
 } = {}, attributes: {
     [ key: string ]: string

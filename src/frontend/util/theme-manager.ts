@@ -26,18 +26,18 @@ export interface Theme
 let themes: Map<string, Theme> = new Map<string, Theme>();
 
 const __themeConversionMap = {
-    'primaryColor': 'primary-color',
-    'secondaryColor': 'secondary-color',
-    'inputColor': 'input-color',
-    'inputHoverColor': 'input-hover-color',
-    'inputInactiveColor': 'input-inactive-color',
-    'inputActiveColor': 'input-active-color',
-    'inputBorderColor': 'input-border-color',
+    'primaryColor': 'primary-bg',
+    'secondaryColor': 'secondary-bg',
+    'inputColor': 'input-static-bg',
+    'inputHoverColor': 'input-hover-bg',
+    'inputInactiveColor': 'input-inactive-bg',
+    'inputActiveColor': 'input-active-bg',
+    'inputBorderColor': 'input-border-bg',
     'inputBorderHoverColor': 'input-border-hover-color',
-    'borderPrimaryColor': 'border-primary-color',
-    'borderSecondaryColor': 'border-secondary-color',
-    'textPrimaryColor': 'text-primary-color',
-    'textSecondaryColor': 'text-secondary-color'
+    'borderPrimaryColor': 'border-1',
+    'borderSecondaryColor': 'border-2',
+    'textPrimaryColor': 'text-color',
+    'textSecondaryColor': 'text-color-2'
 }
 
 /**
@@ -103,15 +103,16 @@ export function getThemes()
 export function applyTheme(themeName: string)
 {
     let theme = themes.get(themeName);
+    let styleElement = document.getElementById('theme-styles');
     if ( !theme )
     {
-        console.warn(`Unable to load theme '${themeName}': Theme not found.`);
+        console.warn(`Unable to load theme '${themeName}': Theme not found. Setting default.`);
+        styleElement.remove();
         return;
     }
 
     console.log(`Applying theme '${themeName}'`);
 
-    let styleElement = document.getElementById('theme-styles');
 
     // Make sure the style element exists
     if ( styleElement )
@@ -125,7 +126,9 @@ export function applyTheme(themeName: string)
     // Apply the theme to the style element
     let tags = Object.keys(__themeConversionMap)
         .filter(tag => theme.hasOwnProperty(tag))
-        .map(tag => `--${__themeConversionMap[tag]}: ${theme[tag]};`);
-    styleElement.innerText = `* { ${tags.join('')} }`;
+        .map(tag => `--${__themeConversionMap[ tag ]}: ${theme[ tag ]};`);
+    styleElement.innerHTML = `:root { ${tags.join('')} }`;
     document.head.appendChild(styleElement);
 }
+
+window['applyTheme'] = applyTheme;

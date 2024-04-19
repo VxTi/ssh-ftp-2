@@ -30,7 +30,13 @@ export class SessionElement extends HTMLElement
                 .forEach(element => element.removeAttribute('connected'));
             this.setAttribute('connecting', '');
             console.log("Connecting to session: ", this.getAttribute('sessionUid'));
-            window[ 'app' ][ 'sessions' ].connect(this.getAttribute('sessionUid'));
+            window[ 'app' ][ 'sessions' ].connect(this.getAttribute('sessionUid'))
+                .catch((_: Error) =>
+                {
+                    this.setAttribute('connect-failed', '');
+                    this.removeAttribute('connecting');
+                    console.error("Failed to connect to session; timed out ?", _)
+                });
 
         });
         this.addEventListener('click', _ =>

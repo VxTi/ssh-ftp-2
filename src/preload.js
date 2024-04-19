@@ -25,6 +25,11 @@ const __app_main_context = {
         join: (...args) => path.join(...args),
     },
     /**
+     * Open the settings window.
+     */
+    openSettings: () =>
+        ipcRenderer.invoke('app:settings'),
+    /**
      * Handle an event from the main process.
      * @param {string} eventName - The name of the event to handle.
      * @param {Function} handler - The handler function for the event.
@@ -33,6 +38,7 @@ const __app_main_context = {
         ipcRenderer.on(eventName, (event, ...args) => handler(...args)),
     localFs: {
         appDirectory: ipcRenderer.sendSync('app:path'),
+        resourcesDirectory: path.join(__dirname, 'resources'),
         homeDir: os.homedir(),
 
         /**

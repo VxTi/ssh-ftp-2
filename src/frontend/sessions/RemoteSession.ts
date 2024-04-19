@@ -1,22 +1,17 @@
 /**
- * @description Interface for managing remote session data.
+ * @file RemoteSession.ts
+ * @description Class for managing remote session data.
+ * @author Luca Warmenhoven
+ * @date Created on Monday, April 15, 2024 - 17:38
  */
-export interface RemoteSessionProperties
-{
-    sessionUid: number;
-    host: string;
-    port?: number;
-    username: string;
-    password?: string;
-    passphrase?: string;
-    privateKey?: string;
-}
+
+import { IRemoteSessionProperties } from "./IRemoteSessionProperties";
 
 /**
  * @class RemoteSession
  * @description Class for managing remote session data.
  */
-export class RemoteSession
+export class RemoteSession implements IRemoteSessionProperties
 {
     sessionUid: number;
     host: string;
@@ -30,7 +25,7 @@ export class RemoteSession
      * Constructor for the RemoteSession class.
      * @param properties
      */
-    constructor(properties: RemoteSessionProperties)
+    constructor(properties: IRemoteSessionProperties)
     {
         this.sessionUid = properties.sessionUid;
         this.host = properties.host;

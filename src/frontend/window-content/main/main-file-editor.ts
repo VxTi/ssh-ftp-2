@@ -5,7 +5,7 @@
  */
 
 
-import { showContent } from "./window-content-manager";
+import { showContent } from "../window-content-manager";
 import {
     appendTo,
     attachFutureListener,
@@ -13,18 +13,18 @@ import {
     CONTAINER_SPREAD_AROUND,
     CONTAINER_TOP_BOTTOM,
     createElement
-} from "../util/element-assembler";
-import { FrameState } from "../util/frame-state";
+} from "../../util/element-assembler";
+import { IFrameState } from "../../util/IFrameState";
 
 /**
  * Function that builds the file editor
  */
-export function assembleFileEditor(frameContext: FrameState)
+export function assembleFileEditor(frameContext: IFrameState)
 {
     // Generate the previous window.
     attachFutureListener('action-back', 'click', (event: MouseEvent) =>
     {
-        showContent( frameContext.previousWindowId, {
+        showContent(frameContext.previousWindowId, {
             container: frameContext.container,
             parameters: frameContext.previousWindowParameters,
             previousWindowId: 'file-editor'
@@ -33,7 +33,7 @@ export function assembleFileEditor(frameContext: FrameState)
 
     appendTo(frameContext.container,
         /** Container for all content */
-        createElement('div', [...CONTAINER_TOP_BOTTOM, 'scroll'], [
+        createElement('div', [ ...CONTAINER_TOP_BOTTOM, 'scroll' ], [
 
             /* Action container */
             createElement('div', [ ...CONTAINER_SPREAD_AROUND, 'border-bottom', 'fit-v-content', 'max-width' ], [
@@ -42,7 +42,7 @@ export function assembleFileEditor(frameContext: FrameState)
 
                 /* Container for actions on the right */
                 createElement('div', CONTAINER_LEFT_RIGHT, [
-                    createElement('div', ['action', 'action-save-file'], [], {
+                    createElement('div', [ 'action', 'action-save-file' ], [], {
                         innerText: 'Save File',
                         id: 'action-save-file'
                     })
@@ -67,7 +67,7 @@ export function assembleFileEditor(frameContext: FrameState)
     let contentContainer = document.getElementById('file-editor-container');
 
     // Check if the provided init arguments have the `content` property
-    if ( frameContext.parameters.hasOwnProperty('content'))
+    if ( frameContext.parameters.hasOwnProperty('content') )
     {
 
         let lines: string[] = frameContext.parameters[ 'content' ].split('\n');

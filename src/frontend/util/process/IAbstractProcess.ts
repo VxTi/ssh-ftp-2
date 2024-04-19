@@ -1,10 +1,10 @@
 /**
- * @fileoverview abstract-process.ts @ ssh-ftp-remake
+ * @fileoverview IAbstractProcess.ts @ ssh-ftp-remake
  * @author Luca Warmenhoven
  * @date Created on Thursday, April 18, 2024 - 19:19
  */
 
-export interface AbstractProcess
+export interface IAbstractProcess
 {
     /**
      * The ID of the process.

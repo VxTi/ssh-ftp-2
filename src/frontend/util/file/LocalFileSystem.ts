@@ -1,9 +1,9 @@
-import { AbstractFileSystem } from "./abstract-file-system";
-import { IFileInfo } from "./file-info";
-import { RemoteFileSystem } from "./remote-file-system";
-import { AbstractFile } from "./abstract-file";
+import { IAbstractFileSystem } from "./IAbstractFileSystem";
+import { IFileInfo } from "./IFileInfo";
+import { RemoteFileSystem } from "./RemoteFileSystem";
+import { AbstractFile } from "./AbstractFile";
 
-export class LocalFileSystem implements AbstractFileSystem
+export class LocalFileSystem implements IAbstractFileSystem
 {
 
     // The current working directory of the file system.
@@ -30,17 +30,17 @@ export class LocalFileSystem implements AbstractFileSystem
     async listFiles(path: string): Promise<AbstractFile[]>
     {
         return await window[ 'app' ][ 'localFs' ].list(path)
-            .then((files: string[]) => files.filter(file => file !== '..' && file !== '.') )
+            .then((files: string[]) => files.filter(file => file !== '..' && file !== '.'))
             .then((files: string[]) => Promise.all(
                 files.map(async (file: string) =>
                     window[ 'app' ][ 'localFs' ].info(
-                    window[ 'app' ][ 'path' ].join(path, file)
-                ).then((fileInfo: IFileInfo) => new AbstractFile(
-                    fileInfo.name,
-                    fileInfo.path,
-                    fileInfo.type,
-                    fileInfo)))
-                ));
+                        window[ 'app' ][ 'path' ].join(path, file)
+                    ).then((fileInfo: IFileInfo) => new AbstractFile(
+                        fileInfo.name,
+                        fileInfo.path,
+                        fileInfo.type,
+                        fileInfo)))
+            ));
     }
 
     /**
@@ -49,7 +49,7 @@ export class LocalFileSystem implements AbstractFileSystem
      * @param newPath - The new path of the file.
      * @param dstFs - The destination file system.
      */
-    moveFile(oldPath: string, newPath: string, dstFs: AbstractFileSystem): Promise<void>
+    moveFile(oldPath: string, newPath: string, dstFs: IAbstractFileSystem): Promise<void>
     {
         if ( dstFs instanceof LocalFileSystem )
             return window[ 'app' ][ 'localFs' ].move(oldPath, newPath);

@@ -1,0 +1,18 @@
+[
+    {
+        "title": "Appearance",
+        "uid": "appearance",
+        "kind": "page",
+        "items": [
+            "appearance.theme"
+        ]
+    },
+    {
+        "title": "SSH",
+        "uid": "ssh",
+        "kind": "page",
+        "items": [
+            "ssh.ssh"
+        ]
+    }
+]

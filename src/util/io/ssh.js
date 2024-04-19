@@ -11,7 +11,7 @@ const fs = require('fs');
  * Map containing all registered SSH sessions
  * from local storage.
  * The key is the session UID and the value is the session object.
- * @type {Map<string, RemoteSessionProperties>}
+ * @type {Map<string, IRemoteSessionProperties>}
  */
 const sessionMap = new Map();
 
@@ -88,8 +88,8 @@ function __init(ipcMain, app)
 
     /**
      * Function for validating the data of an SSH session.
-     * @param {RemoteSessionProperties[]} sessionData - The session data to validate.
-     * @returns {RemoteSessionProperties[]} - The validated session data.
+     * @param {IRemoteSessionProperties[]} sessionData - The session data to validate.
+     * @returns {IRemoteSessionProperties[]} - The validated session data.
      */
     function validateData(sessionData)
     {
@@ -185,7 +185,7 @@ function __init(ipcMain, app)
     /**
      * Event handler for connecting to an SSH session.
      */
-    ipcMain.handle('ssh:connect-session', (event, sessionUid) =>
+    ipcMain.handle('ssh:connect-session', async (event, sessionUid) =>
     {
         console.log("Connecting to session", sessionUid);
         if ( !sessionMap.has(sessionUid) )
@@ -195,7 +195,7 @@ function __init(ipcMain, app)
         let client = new NodeSSH();
         let onData = data => event.sender.send('ssh:data', data);
         event.sender.send('ssh:attempt-connect', sessionUid);
-        return Promise.resolve(client.connect({
+        return client.connect({
             host: session.host,
             username: session.username,
             privateKey: session.privateKey,
@@ -220,7 +220,7 @@ function __init(ipcMain, app)
 
                 })
             activeSessions.set(sessionUid, { ssh: client, onData: onData });
-        }))
+        })
     });
 
     /**

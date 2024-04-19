@@ -1,9 +1,9 @@
-import { AbstractFileSystem } from "./abstract-file-system";
-import { IFileInfo } from "./file-info";
-import { LocalFileSystem } from "./local-file-system";
-import { AbstractFile } from "./abstract-file";
+import { IAbstractFileSystem } from "./IAbstractFileSystem";
+import { IFileInfo } from "./IFileInfo";
+import { LocalFileSystem } from "./LocalFileSystem";
+import { AbstractFile } from "./AbstractFile";
 
-export class RemoteFileSystem implements AbstractFileSystem
+export class RemoteFileSystem implements IAbstractFileSystem
 {
 
     readonly sessionUid: string;
@@ -67,7 +67,7 @@ export class RemoteFileSystem implements AbstractFileSystem
                         if ( !parameters )
                             throw new Error("Unable to parse file data: \n" + data);
 
-                        const [, permissions, fileCount, owner, group, size, month, date, yearOrTime, filename] = parameters;
+                        const [ , permissions, fileCount, owner, group, size, month, date, yearOrTime, filename ] = parameters;
 
                         let fileType = permissions.charAt(0) === 'd' ? 'directory' :
                             filename.indexOf('.') !== -1 ? filename.split('.').pop() : 'file';
@@ -98,7 +98,7 @@ export class RemoteFileSystem implements AbstractFileSystem
      * @param newPath
      * @param dstFs
      */
-    moveFile(oldPath: string, newPath: string, dstFs: AbstractFileSystem): Promise<void>
+    moveFile(oldPath: string, newPath: string, dstFs: IAbstractFileSystem): Promise<void>
     {
         if ( dstFs instanceof RemoteFileSystem )
             return window[ 'app' ][ 'sessions' ][ 'fs' ].move(this.sessionUid, oldPath, newPath);

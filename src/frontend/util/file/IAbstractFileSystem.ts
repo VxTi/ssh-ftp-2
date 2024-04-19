@@ -3,10 +3,10 @@
  * This interface is used to define the methods that
  * are required for an abstract file system.
  */
-import { IFileInfo } from "./file-info";
-import { AbstractFile } from "./abstract-file";
+import { IFileInfo } from "./IFileInfo";
+import { AbstractFile } from "./AbstractFile";
 
-export interface AbstractFileSystem
+export interface IAbstractFileSystem
 {
 
     /**
@@ -40,7 +40,7 @@ export interface AbstractFileSystem
      * @param newPath The new path of the file.
      * @param dstFs The destination file system.
      */
-    moveFile(oldPath: string, newPath: string, dstFs: AbstractFileSystem): Promise<void>;
+    moveFile(oldPath: string, newPath: string, dstFs: IAbstractFileSystem): Promise<void>;
 
     /**
      * Method to delete multiple files.

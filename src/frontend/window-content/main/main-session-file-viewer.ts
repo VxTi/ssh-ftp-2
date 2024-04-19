@@ -1,4 +1,4 @@
-import { showContent } from "./window-content-manager";
+import { showContent } from "../window-content-manager";
 import {
     appendTo,
     attachFutureListener,
@@ -7,19 +7,19 @@ import {
     CONTAINER_RIGHT_LEFT,
     CONTAINER_TOP_BOTTOM,
     createElement
-} from "../util/element-assembler";
-import { FrameState } from "../util/frame-state";
-import { AbstractFileSystem } from "../util/file-management/abstract-file-system";
-import { AbstractFile } from "../util/file-management/abstract-file";
-import { LocalFileSystem } from "../util/file-management/local-file-system";
-import { RemoteFileSystem } from "../util/file-management/remote-file-system";
-import { notify } from "./notification";
+} from "../../util/element-assembler";
+import { IFrameState } from "../../util/IFrameState";
+import { IAbstractFileSystem } from "../../util/file/IAbstractFileSystem";
+import { AbstractFile } from "../../util/file/AbstractFile";
+import { LocalFileSystem } from "../../util/file/LocalFileSystem";
+import { RemoteFileSystem } from "../../util/file/RemoteFileSystem";
+import { notify } from "../notification";
 
 /**
  * File system instances for the local and remote file systems.
  */
-let localFileSystem: AbstractFileSystem = null;
-let remoteFileSystem: AbstractFileSystem = null;
+let localFileSystem: IAbstractFileSystem = null;
+let remoteFileSystem: IAbstractFileSystem = null;
 
 /**
  * The maximum number of items to keep in the window activity history.
@@ -31,7 +31,7 @@ const MAX_WINDOW_ACTIVITY_HISTORY = 25;
 /**
  * Function for generating the file viewer.
  */
-export function assembleFileViewer(frameContext: FrameState)
+export function assembleFileViewer(frameContext: IFrameState)
 {
     /*
      * Attach event listeners to the action buttons.
@@ -101,7 +101,7 @@ export function assembleFileViewer(frameContext: FrameState)
 
         ]),
         /* Terminal container */
-        createElement('div', [ 'container', 'align-vertical', 'main-start', 'border-top', 'terminal' ], [
+        createElement('div', [ 'container', 'align-vertical', 'main-start', 'border-top', 'terminal', 'resize-vertical' ], [
             /* Open terminal windows container */
             createElement('div', [ ...CONTAINER_LEFT_RIGHT, 'full-width', 'bg-secondary' ], [
                 createElement('div', [ 'terminal-tab' ])
@@ -124,7 +124,7 @@ export function assembleFileViewer(frameContext: FrameState)
 /**
  * Function for navigating through a file system.
  */
-export function navigateTo(path: string, fileSystem: AbstractFileSystem, targetElement: HTMLElement)
+export function navigateTo(path: string, fileSystem: IAbstractFileSystem, targetElement: HTMLElement)
 {
     if ( !path || typeof path !== 'string' || !fileSystem || !targetElement )
         throw new Error("'loadFiles' was called with invalid parameters.");
@@ -162,7 +162,7 @@ export function navigateTo(path: string, fileSystem: AbstractFileSystem, targetE
 /**
  * Function for creating a file element.
  */
-function createFileElement(file: AbstractFile, targetElement: HTMLElement, path: string, fileSystem: AbstractFileSystem)
+function createFileElement(file: AbstractFile, targetElement: HTMLElement, path: string, fileSystem: IAbstractFileSystem)
 {
     let newElement = createElement('file-element', [], [], {}, {
         name: file.name,

@@ -3,11 +3,15 @@ const path = require('path');
 module.exports = {
     entry: {
         "app": [
-            './src/frontend/core-functionality.ts',
-            './src/frontend/custom-elements/file-element.ts',
-            './src/frontend/custom-elements/session-element.ts',
-            './src/frontend/custom-elements/circular-loading-element.ts',
-            './src/frontend/sessions/remote-session',
+            './src/frontend/core-functionality',
+            './src/frontend/custom-elements/file-element',
+            './src/frontend/custom-elements/session-element',
+            './src/frontend/custom-elements/circular-loading-element',
+            './src/frontend/sessions/RemoteSession',
+        ],
+        "settings": [
+            './src/frontend/util/theme-manager',
+            './src/frontend/settings/settings-handling'
         ]
     },
     output: {

@@ -9,7 +9,8 @@
  * window should be initialized with, what the previous window was, and what
  * it was initialized with.
  */
-export interface FrameState {
+export interface IFrameState
+{
 
     /**
      * The element that hosts the frame.

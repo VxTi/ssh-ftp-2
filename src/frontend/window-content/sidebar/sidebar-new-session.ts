@@ -3,22 +3,22 @@
  */
 
 
-import { showContent } from "./window-content-manager";
+import { showContent } from "../window-content-manager";
 import {
     appendTo,
     attachFutureListener,
     CONTAINER_LEFT_RIGHT,
     CONTAINER_TOP_BOTTOM,
     createElement
-} from "../util/element-assembler";
-import { RemoteSession } from "../sessions/remote-session";
-import { FrameState } from "../util/frame-state";
+} from "../../util/element-assembler";
+import { RemoteSession } from "../../sessions/RemoteSession";
+import { IFrameState } from "../../util/IFrameState";
 
 /**
  * Function to assemble the add session menu.
  * This function will be called when the user clicks the add session button.
  */
-export function assembleAddSessionMenu(frameContext: FrameState)
+export function assembleAddSessionMenu(frameContext: IFrameState)
 {
     /** Event listener for when the user clicks the cancel button. */
     attachFutureListener('action-cancel-session', 'click', _ =>

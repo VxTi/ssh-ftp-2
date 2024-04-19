@@ -1,8 +1,8 @@
 /**
  * @module session-list
  */
-import { showContent } from "./window-content-manager";
-import { RemoteSession } from "../sessions/remote-session";
+import { showContent } from "../window-content-manager";
+import { RemoteSession } from "../../sessions/RemoteSession";
 import {
     appendTo,
     attachFutureListener,
@@ -10,14 +10,14 @@ import {
     CONTAINER_LEFT_RIGHT,
     CONTAINER_TOP_BOTTOM,
     createElement
-} from "../util/element-assembler";
-import { FrameState } from "../util/frame-state";
+} from "../../util/element-assembler";
+import { IFrameState } from "../../util/IFrameState";
 
 /**
  * Function to assemble the session list.
  * @param frameContext The initialization
  */
-export function assembleSessionList(frameContext: FrameState)
+export function assembleSessionList(frameContext: IFrameState)
 {
     // When clicked on the 'Add session' button, show the 'create-session' window
     attachFutureListener('action-add-session', 'click', () => showContent('create-session', {
@@ -45,7 +45,8 @@ export function assembleSessionList(frameContext: FrameState)
         inputBox.focus();
         inputBox.addEventListener('blur', () => (inputBox as HTMLInputElement).value = '');
     });
-    attachFutureListener('search-input-session', 'input', event => {
+    attachFutureListener('search-input-session', 'input', event =>
+    {
         let searchValue = (event.target as HTMLInputElement).value;
         document.getElementById('side-container')
             .querySelectorAll('session-element')

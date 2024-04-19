@@ -12,8 +12,10 @@ let os = require('os');
 function createWindow(pagePath, createArgs = {})
 {
     let window = new BrowserWindow(Object.assign({
-        width: 900,
-        height: 700,
+        width: 1200,
+        height: 900,
+        minWidth: 500,
+        minHeight: 600,
         transparent: true,
         titleBarOverlay: false,
         show: false,
