@@ -9,12 +9,10 @@ import { registerSetting } from "./settings/Settings";
 // The target element which is currently being resized.
 let resizeTarget: HTMLElement = null;
 
-document.addEventListener('DOMContentLoaded', async _ =>
-{
+document.addEventListener('DOMContentLoaded', async _ => {
 
     // Create navigator if the user is on a Mac
-    if ( window[ 'app' ][ 'os' ].isMac )
-    {
+    if ( window[ 'app' ][ 'os' ].isMac ) {
         let navigator = document.createElement('div');
         navigator.id = 'navigator';
         navigator.classList.add('navigator', 'border-bottom');
@@ -38,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async _ =>
                         settingType: 'select',
                         inputType: 'single',
                         initialValue: 'default',
-                        data: ['Default', ...getThemes()],
+                        data: [ 'Default', ...getThemes() ],
                         onInteract: (value: string) => applyTheme(value)
                     }
                 ]
@@ -52,8 +50,7 @@ document.addEventListener('DOMContentLoaded', async _ =>
 
     /** Whenever the mouse is down and the target element has a resizable class, add the 'active' attribute **/
     document.addEventListener('mousedown', (event: MouseEvent) => {
-        if ( event.target instanceof HTMLElement && event.target.closest('.resize-horizontal, .resize-vertical'))
-        {
+        if ( event.target instanceof HTMLElement && event.target.closest('.resize-horizontal, .resize-vertical') ) {
             event.target.setAttribute('active', '');
             resizeTarget = event.target as HTMLElement;
         }
@@ -61,24 +58,22 @@ document.addEventListener('DOMContentLoaded', async _ =>
 
     /** Remove all 'active' attributes from the resizing elements once the mouse is released.**/
     document.addEventListener('mouseup', (event: MouseEvent) => {
-        if ( resizeTarget != null )
-        {
+        if ( resizeTarget != null ) {
             resizeTarget.removeAttribute('active');
             resizeTarget = null;
         }
     });
     /** Whenever the mouse moves,  */
     document.addEventListener('mousemove', (event: MouseEvent) => {
-        if ( resizeTarget === null)
+        if ( resizeTarget === null )
             return;
-        if ( resizeTarget.classList.contains('resize-horizontal'))
+        if ( resizeTarget.classList.contains('resize-horizontal') )
             resizeTarget.style.setProperty('--horizontal', event.clientX.toString());
         else resizeTarget.style.setProperty('--vertical', event.clientY.toString());
     });
 
     document.getElementById('sidebar-visibility-toggle')
-        .addEventListener('click', _ =>
-        {
+        .addEventListener('click', _ => {
             let sidebar = document.getElementById('sidebar-container');
             if ( sidebar.hasAttribute('expanded') )
                 sidebar.removeAttribute('expanded');
@@ -91,8 +86,7 @@ document.addEventListener('DOMContentLoaded', async _ =>
  * Event listener for when a user clicks outside a selected element.
  * This will remove the selected attribute from all elements.
  */
-window.addEventListener('click', event =>
-{
+window.addEventListener('click', event => {
     if ( event.target instanceof HTMLElement && event.target.closest(':is([selected], .action)') === null )
         document.querySelectorAll('[selected]').forEach((element: HTMLElement) =>
             element.removeAttribute('selected'));

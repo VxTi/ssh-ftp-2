@@ -2,8 +2,7 @@
  * File Info Interface
  * Contains information about a file
  */
-export interface IFileInfo
-{
+export interface IFileInfo {
     readonly name: string;
     readonly path: string;
     readonly isFile: boolean;

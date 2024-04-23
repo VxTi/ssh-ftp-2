@@ -17,8 +17,7 @@ import { IFrameState } from "../../util/IFrameState";
  * Function to assemble the session list.
  * @param frameContext The initialization
  */
-export function assembleSessionList(frameContext: IFrameState)
-{
+export function assembleSessionList(frameContext: IFrameState) {
     // When clicked on the 'Add session' button, show the 'create-session' window
     attachFutureListener('action-add-session', 'click', () => showContent('create-session', {
         container: document.getElementById('side-container'),
@@ -27,8 +26,7 @@ export function assembleSessionList(frameContext: IFrameState)
     }));
     attachFutureListener('action-delete-session', 'click', _ =>
         window.dispatchEvent(new CustomEvent('session:delete')));
-    attachFutureListener('action-refresh-sessions', 'click', _ =>
-    {
+    attachFutureListener('action-refresh-sessions', 'click', _ => {
         document.getElementById('side-container')
             .querySelectorAll('session-element')
             .forEach((element: HTMLElement) => element.remove());
@@ -37,21 +35,18 @@ export function assembleSessionList(frameContext: IFrameState)
     });
 
     /* Add the selected attribute to the search input and focus the textbox */
-    attachFutureListener('action-search-session', 'click', _ =>
-    {
+    attachFutureListener('action-search-session', 'click', _ => {
         document.getElementById('action-search-session')
             .setAttribute('selected', '');
         let inputBox = document.getElementById('search-input-session');
         inputBox.focus();
         inputBox.addEventListener('blur', () => (inputBox as HTMLInputElement).value = '');
     });
-    attachFutureListener('search-input-session', 'input', event =>
-    {
+    attachFutureListener('search-input-session', 'input', event => {
         let searchValue = (event.target as HTMLInputElement).value;
         document.getElementById('side-container')
             .querySelectorAll('session-element')
-            .forEach((element: HTMLElement) =>
-            {
+            .forEach((element: HTMLElement) => {
                 if ( element.getAttribute('username').includes(searchValue) )
                     element.removeAttribute('hidden');
                 else
@@ -103,14 +98,11 @@ export function assembleSessionList(frameContext: IFrameState)
  * Function to load the session list.
  * @param targetContainer The container to load the session list into.
  */
-function loadSessionList(targetContainer: HTMLElement)
-{
+function loadSessionList(targetContainer: HTMLElement) {
 
     window[ 'app' ][ 'sessions' ].get()
-        .then((sessions: RemoteSession[]) =>
-        {
-            sessions.forEach(session =>
-            {
+        .then((sessions: RemoteSession[]) => {
+            sessions.forEach(session => {
 
                 let sessionElement = document.createElement('session-element');
                 sessionElement.setAttribute('username', session.username);
@@ -125,10 +117,8 @@ function loadSessionList(targetContainer: HTMLElement)
 /**
  * Event listener for when a session is deleted.
  */
-window.addEventListener('session:delete', () =>
-{
-    document.querySelectorAll('session-element[selected]').forEach((element: HTMLElement) =>
-    {
+window.addEventListener('session:delete', () => {
+    document.querySelectorAll('session-element[selected]').forEach((element: HTMLElement) => {
         window[ 'app' ][ 'sessions' ].delete(element.getAttribute('sessionUid'))
             .then(() => element.remove());
     });
@@ -140,13 +130,11 @@ window.addEventListener('session:delete', () =>
  * This event is called from `./util/ssh.js` when one attempts to connect
  * with it, when calling `window.app.sessions.connect(sessionUid)`
  */
-window.addEventListener('session:attempt-connect', (event: CustomEvent) =>
-{
+window.addEventListener('session:attempt-connect', (event: CustomEvent) => {
     console.log("Attempting to connect to session with UID: ", event.detail.sessionUid);
     // Set all session elements to in-active
     // This is a temporary solution to prevent multiple connections
-    document.querySelectorAll('session-element').forEach((element: HTMLElement) =>
-    {
+    document.querySelectorAll('session-element').forEach((element: HTMLElement) => {
         element.setAttribute('inactive', '');
         element.removeAttribute('connecting');
         if ( element.getAttribute('sessionUid') === event.detail.sessionUid )

@@ -8,14 +8,12 @@ const { app } = require("electron");
  * @param {IpcMain} ipcMain - The IPC main object.
  * @private
  */
-function __init(ipcMain)
-{
+function __init(ipcMain) {
     let path = require('path');
     let fs = require('fs');
 
     const appDirectory = path.join(app.getPath('appData'), app.getName());
-    if (!fs.existsSync(appDirectory))
-    {
+    if ( !fs.existsSync(appDirectory) ) {
         fs.mkdirSync(appDirectory);
         console.log("Creating app directory at: " + appDirectory)
     }
@@ -26,8 +24,7 @@ function __init(ipcMain)
         fs.promises.readFile(filePath, { encoding: 'utf-8' }))
 
     /** Get the information about a file at the given path. */
-    ipcMain.handle('localfs:info', async (event, filePath) =>
-    {
+    ipcMain.handle('localfs:info', async (event, filePath) => {
         let fileStats = fs.lstatSync(filePath);
         let fileName = path.basename(filePath);
         return {
@@ -50,7 +47,14 @@ function __init(ipcMain)
 
     /** List the contents of a directory at the given path. */
     ipcMain.handle('localfs:list', async (event, dirPath) =>
-        fs.promises.readdir(dirPath));
+    {
+        try {
+            return fs.promises.readdir(dirPath)
+        }
+        catch (e) {
+            return Promise.reject();
+        }
+    });
 
     /** Delete a file at the given path. */
     ipcMain.handle('localfs:delete', async (_, filePath) =>

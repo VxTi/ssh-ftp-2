@@ -14,8 +14,7 @@ export type ContextPriority = number;
  */
 export type AppContextEvent = 'load' | 'unload' | 'focus' | 'unfocus';
 
-export class AppContext
-{
+export class AppContext {
     /**
      * The current context ID. This is the same as the ID of the element.
      * Can later be used to keep track of which context is which.
@@ -69,8 +68,7 @@ export class AppContext
      * @param referenceElement The element that this context is associated with.
      * @private
      */
-    private constructor(referenceElement: Element)
-    {
+    private constructor(referenceElement: Element) {
         this.contentElement = referenceElement;
     }
 
@@ -78,9 +76,8 @@ export class AppContext
      * Create a new AppContext instance.
      * @param referenceElement The element that this context is associated with.
      */
-    static create<T extends Element>(referenceElement: T): AppContext
-    {
-        return new AppContext( referenceElement );
+    static create<T extends Element>(referenceElement: T): AppContext {
+        return new AppContext(referenceElement);
     }
 
     /**
@@ -90,13 +87,12 @@ export class AppContext
      * @param event The event to handle.
      * @param callback The callback function to call when the event is triggered.
      */
-    on(event: AppContextEvent, callback: ((context: AppContext) => {})[]): void
-    {
+    on(event: AppContextEvent, callback: ((context: AppContext) => {})[]): void {
         // Check if the event is a valid event.
         // If it is, push the callback to the event handler.
         // Otherwise, create a new event handler.
-        if ( this.hasOwnProperty( 'on' + event ) )
-            this[ 'on' + event ].push( callback );
+        if ( this.hasOwnProperty('on' + event) )
+            this[ 'on' + event ].push(callback);
         else
             this[ 'on' + event ] = [ callback ];
     }
@@ -107,12 +103,11 @@ export class AppContext
      * @param event The event to emit.
      * @param parameters The parameters to pass to the event handlers.
      */
-    emit(event: AppContextEvent, ...parameters: any[]): void
-    {
+    emit(event: AppContextEvent, ...parameters: any[]): void {
         // Check if the event is a valid event.
         // If it is, call all the event handlers.
-        (this[ 'on' + event ] as ((context: AppContext, ...parameters: any[]) => {})[])?.forEach( callback => callback( this, ...parameters ) );
-        console.trace( `Event '${ event }' emitted with parameters:`, parameters);
+        (this[ 'on' + event ] as ((context: AppContext, ...parameters: any[]) => {})[])?.forEach(callback => callback(this, ...parameters));
+        console.trace(`Event '${event}' emitted with parameters:`, parameters);
     }
 }
 
@@ -120,8 +115,7 @@ export class AppContext
  * Class containing all possible application states.
  * Used to keep track of possible page changes, and reverting to previous states.
  */
-export class AppState
-{
+export class AppState {
     /**
      * The current context of the application.
      */
@@ -137,7 +131,8 @@ export class AppState
      * This class is a singleton and should not be instantiated.
      * @private
      */
-    private constructor() {}
+    private constructor() {
+    }
 
     /**
      * Function for changing the current context.
@@ -148,25 +143,22 @@ export class AppState
      *                     If set to false, the context will only be pushed to the stack.
      * @throws Error when the context is already registered.
      */
-    static pushContext(context: AppContext, setAsCurrent: boolean = true): void
-    {
-        if ( this.__contextStack.some( ctx => ctx.contextId === context.contextId ) )
-            throw new Error( `The context with the ID '${ context.contextId }' has already been registered.` );
+    static pushContext(context: AppContext, setAsCurrent: boolean = true): void {
+        if ( this.__contextStack.some(ctx => ctx.contextId === context.contextId) )
+            throw new Error(`The context with the ID '${context.contextId}' has already been registered.`);
 
         // Call the load event handlers.
-        this.__currentContext.emit( 'load' );
+        this.__currentContext.emit('load');
 
-        if ( setAsCurrent )
-        {
+        if ( setAsCurrent ) {
             this.__currentContext = context;
             this.__currentContext.focussed = true;
             // Call the focus event handlers.
-            this.__currentContext.emit( 'focus' );
+            this.__currentContext.emit('focus');
         }
-        else
-        {
+        else {
             // Push the context to the stack.
-            this.__contextStack.push( context );
+            this.__contextStack.push(context);
         }
     }
 
@@ -179,8 +171,7 @@ export class AppState
      * @param context The ID or context to switch to.
      * @throws Error when the context with the ID isn't registered.
      */
-    static switchContext(context: string | AppContext): void
-    {
+    static switchContext(context: string | AppContext): void {
         // If the context is a string, find the context with the same ID.
         // otherwise, use the provided context instance;
         let referenceId = context instanceof AppContext ? context.contextId : context;
@@ -190,36 +181,32 @@ export class AppState
             return;
 
         // Find the context with the same ID as referenceId.
-        for ( let ctx of this.__contextStack )
-        {
-            if ( ctx.contextId === referenceId )
-            {
+        for ( let ctx of this.__contextStack ) {
+            if ( ctx.contextId === referenceId ) {
                 // If there's a current context, push it to the
                 // stack and set the new context as current.
-                if ( this.__currentContext != null )
-                {
-                    this.__contextStack.push( this.__currentContext );
+                if ( this.__currentContext != null ) {
+                    this.__contextStack.push(this.__currentContext);
                     this.__currentContext.focussed = false;
 
                     // Call the 'onunfocus' event handlers.
-                    this.__currentContext.emit( 'unfocus' );
+                    this.__currentContext.emit('unfocus');
                 }
 
                 // Set the new context as the current context,
                 // and call the 'onfocus' event handlers.
                 this.__currentContext = ctx;
-                this.__currentContext.emit( 'focus')
+                this.__currentContext.emit('focus')
                 return; // Exit the function.
             }
         }
-        throw new Error( `The context with the ID '${ referenceId }' has not been registered.` );
+        throw new Error(`The context with the ID '${referenceId}' has not been registered.`);
     }
 
     /**
      * Get the context stack of the application.
      */
-    static get contextStack(): AppContext[]
-    {
+    static get contextStack(): AppContext[] {
         return this.__contextStack;
     }
 
@@ -227,16 +214,14 @@ export class AppState
      * Clear the context stack.
      * This will remove all contexts from the stack.
      */
-    static clearContextStack(): void
-    {
+    static clearContextStack(): void {
         this.__contextStack = [];
     }
 
     /**
      * Get the current context ( highest priority ) of the application.
      */
-    static get currentContext(): AppContext
-    {
+    static get currentContext(): AppContext {
         return this.__currentContext;
     }
 
@@ -246,18 +231,17 @@ export class AppState
      * or the last context if all contexts have the same priority.
      * @throws Error when there are no contexts to pop, or when the context is already the last context.
      */
-    static popContext(): void
-    {
+    static popContext(): void {
         if ( this.__contextStack.length === 0 )
-            throw new Error( 'There are no contexts to pop.' );
+            throw new Error('There are no contexts to pop.');
 
         if ( this.__contextStack.length === 1 )
-            throw new Error( 'The context is already the last context.' );
+            throw new Error('The context is already the last context.');
 
         this.__currentContext.onunfocus
-            .forEach( callback => callback( this.__currentContext ) );
+            .forEach(callback => callback(this.__currentContext));
         this.__currentContext.onunload
-            .forEach( callback => callback( this.__currentContext ) );
+            .forEach(callback => callback(this.__currentContext));
 
         // Remove the current context from the stack.
         this.__contextStack.pop();
@@ -266,8 +250,7 @@ export class AppState
         let firstCandidate: AppContext = this.__contextStack[ this.__contextStack.length - 1 ];
         let mainCandidate: AppContext = this.__contextStack[ this.__contextStack.length - 1 ];
 
-        for ( let i = 0; i < this.__contextStack.length - 1; i++ )
-        {
+        for ( let i = 0; i < this.__contextStack.length - 1; i++ ) {
             if ( this.__contextStack[ i ].priority < mainCandidate.priority )
                 mainCandidate = this.__contextStack[ i ];
         }
@@ -277,7 +260,7 @@ export class AppState
 
         mainCandidate.focussed = true;
         this.__currentContext = mainCandidate;
-        mainCandidate.emit( 'focus' );
+        mainCandidate.emit('focus');
 
     }
 

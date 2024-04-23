@@ -6,8 +6,7 @@
 import { IFileInfo } from "./IFileInfo";
 import { AbstractFile } from "./AbstractFile";
 
-export interface IAbstractFileSystem
-{
+export interface IAbstractFileSystem {
 
     /**
      * The current working directory of the file system.

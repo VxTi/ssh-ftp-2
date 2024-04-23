@@ -4,8 +4,7 @@
  * @date Created on Thursday, April 18, 2024 - 19:19
  */
 
-export interface IAbstractProcess
-{
+export interface IAbstractProcess {
     /**
      * The ID of the process.
      */

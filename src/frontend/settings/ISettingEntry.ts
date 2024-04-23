@@ -10,8 +10,7 @@ import { ISettingDefinition } from "./ISettingDefinition";
  * Interface for settings entries.
  * This interface d
  */
-export interface ISettingEntry
-{
+export interface ISettingEntry {
     title: string;
     identifier: string;
     expandable?: boolean;

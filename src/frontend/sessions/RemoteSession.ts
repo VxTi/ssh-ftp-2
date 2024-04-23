@@ -11,9 +11,8 @@ import { IRemoteSessionProperties } from "./IRemoteSessionProperties";
  * @class RemoteSession
  * @description Class for managing remote session data.
  */
-export class RemoteSession implements IRemoteSessionProperties
-{
-    sessionUid: number;
+export class RemoteSession implements IRemoteSessionProperties {
+    sessionUid: string;
     host: string;
     port?: number;
     username: string;
@@ -25,8 +24,7 @@ export class RemoteSession implements IRemoteSessionProperties
      * Constructor for the RemoteSession class.
      * @param properties
      */
-    constructor(properties: IRemoteSessionProperties)
-    {
+    constructor(properties: IRemoteSessionProperties) {
         this.sessionUid = properties.sessionUid;
         this.host = properties.host;
         this.port = properties.port || 22;

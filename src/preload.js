@@ -167,6 +167,9 @@ const __app_main_context = {
 
             /**
              * Lists the contents of a directory on the remote server.
+             * @param {string} sessionUid - The UID of the session to list the directory contents of.
+             * @param {string} dirPath - The path to the directory to list.
+             * @returns {Promise<IFileInfo[]>} - The contents of the directory.
              */
             list: async (sessionUid, dirPath) =>
                 ipcRenderer.invoke('ssh:list-files', sessionUid, dirPath),
@@ -174,20 +177,20 @@ const __app_main_context = {
             /**
              * Uploads file(s) to the remote server.
              * @param {string} sessionUid - The UID of the session to upload the file(s) to.
-             * @param {string[]} localPaths - The path to the local file(s) to upload.
+             * @param {string[] | string} localPaths - The path to the local file(s) to upload.
              * @param {string} remotePath - The path to the remote directory to upload the file(s) to.
              */
             upload: async (sessionUid, localPaths, remotePath) =>
-                ipcRenderer.invoke('ssh:upload-files', sessionUid, localPaths, remotePath),
+                ipcRenderer.invoke('ssh:upload-files', sessionUid, Array.isArray(localPaths) ? localPaths : [ localPaths ], remotePath),
 
             /**
              * Downloads file(s) from the remote server.
              * @param {string} sessionUid - The UID of the session to download the file(s) from.
-             * @param {string[]} remotePaths - The path to the remote file(s) to download.
+             * @param {string[] | string} remotePaths - The path to the remote file(s) to download.
              * @param {string} localPath - The path to the local directory to download the file(s) to.
              */
             download: async (sessionUid, remotePaths, localPath) =>
-                ipcRenderer.invoke('ssh:download-files', sessionUid, remotePaths, localPath),
+                ipcRenderer.invoke('ssh:download-files', sessionUid, Array.isArray(remotePaths) ? remotePaths : [ remotePaths ], localPath),
 
             /**
              * Deletes file(s) on the remote server.

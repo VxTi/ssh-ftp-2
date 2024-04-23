@@ -18,8 +18,7 @@ const registeredContentMap: Map<string, Function> = new Map();
 /**
  * Function for setting the content of the window to the default content.
  */
-function assembleDefaultContent(frameContext: IFrameState)
-{
+function assembleDefaultContent(frameContext: IFrameState) {
     // The element to clear
     let container = document.getElementById('inner-content');
 
@@ -42,11 +41,9 @@ function assembleDefaultContent(frameContext: IFrameState)
  * Function for clearing the content of the window.
  * @param containerId The ID of the container element to clear
  */
-export function clearWindowContent(containerId: string)
-{
+export function clearWindowContent(containerId: string) {
     let container = document.getElementById(containerId);
-    if ( !container )
-    {
+    if ( !container ) {
         console.error('Error whilst attempting to clear container:');
         console.error(`Container with ID ${containerId} not found.`);
         return;
@@ -60,10 +57,8 @@ export function clearWindowContent(containerId: string)
  * @param contentFrameId - The unique identifier of the frame to register
  * @param generatorFunction - The  function used to generate the content.
  */
-export function registerContentFrame(contentFrameId: string, generatorFunction: Function)
-{
-    if ( registeredContentMap.has(contentFrameId) )
-    {
+export function registerContentFrame(contentFrameId: string, generatorFunction: Function) {
+    if ( registeredContentMap.has(contentFrameId) ) {
         console.log(`Content frame with ID '${contentFrameId}' has already been registered.`);
         return
     }
@@ -76,19 +71,12 @@ export function registerContentFrame(contentFrameId: string, generatorFunction: 
  * @param frameId - The unique ID of the frame that had previously been registered
  * @param initParameters - The parameters that are provided in the generator function.
  */
-export function showContent(frameId: string, initParameters: IFrameState)
-{
-    console.log('`showContent` called with frame ID:', frameId, 'and parameters:', initParameters);
-    window[ 'contentHistory' ] = window[ 'contentHistory' ] || {};
-    let targetId = initParameters.container.id || 'default';
-    window[ 'contentHistory' ][ targetId ] = window[ 'contentHistory' ][ targetId ] || [];
-    window[ 'contentHistory' ][ targetId ].push({ frameId: frameId, parameters: initParameters });
+export function showContent(frameId: string, initParameters: IFrameState) {
 
     if ( !registeredContentMap.has(frameId) )
         throw new Error(`Content frame with ID '${frameId}' does not exist.`)
 
-    if ( !initParameters.container )
-    {
+    if ( !initParameters.container ) {
         console.error('Failed to locate target frame element in function \'loadContent\':');
         console.error('Provided element for parameter \'dstFrame\' does not exist.');
         return
@@ -97,14 +85,12 @@ export function showContent(frameId: string, initParameters: IFrameState)
     // Clear the previous content and then call the generator function.
     initParameters.container.innerHTML = '';
     registeredContentMap.get(frameId)(initParameters);
-
 }
 
 /**
  * Function for registering all main frame generators
  */
-export function registerMainFrames()
-{
+export function registerMainFrames() {
     registerContentFrame('file-editor', assembleFileEditor);
     registerContentFrame('file-viewer', assembleFileViewer);
     registerContentFrame('sessions-list', assembleSessionList);

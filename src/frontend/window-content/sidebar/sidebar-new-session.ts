@@ -18,31 +18,26 @@ import { IFrameState } from "../../util/IFrameState";
  * Function to assemble the add session menu.
  * This function will be called when the user clicks the add session button.
  */
-export function assembleAddSessionMenu(frameContext: IFrameState)
-{
+export function assembleAddSessionMenu(frameContext: IFrameState) {
     /** Event listener for when the user clicks the cancel button. */
     attachFutureListener('action-cancel-session', 'click', _ =>
         showContent('sessions-list', { container: frameContext.container }));
 
-    attachFutureListener('session-show-password', 'click', event =>
-    {
+    attachFutureListener('session-show-password', 'click', event => {
         let passwordInput = document.getElementById('session-password');
         if ( passwordInput.getAttribute('type') === 'password' )
             passwordInput.setAttribute('type', 'text');
         else
             passwordInput.setAttribute('type', 'password');
     });
-    attachFutureListener('ssh-add-session', 'click', _ =>
-    {
+    attachFutureListener('ssh-add-session', 'click', _ => {
         let keysOrdered: string[] = [ 'host', 'port', 'username', 'password', 'privateKey', 'passphrase' ];
         let elements: HTMLInputElement[] = [ 'session-host', 'session-port', 'session-username', 'session-password', 'ssh-private-key', 'ssh-passphrase' ]
             .map(id => (document.getElementById(id) as HTMLInputElement));
 
         let faulty = false;
-        for ( let element of elements )
-        {
-            if ( element.hasAttribute('required') && !element.value )
-            {
+        for ( let element of elements ) {
+            if ( element.hasAttribute('required') && !element.value ) {
                 element.setAttribute('input-error', '');
                 faulty = true;
             }
@@ -84,7 +79,7 @@ export function assembleAddSessionMenu(frameContext: IFrameState)
                     id: 'session-host',
                     title: 'The host address of the session',
                     placeholder: 'Host address'
-                }, { 'required': '' }),
+                }, { 'required': '', tabindex: '1' }),
                 createElement('input', [ 'input-box', 'ssh-port', 'input-small-rect', 'round-right-5' ], [], {
                     type: 'number',
                     name: 'port',
@@ -100,7 +95,7 @@ export function assembleAddSessionMenu(frameContext: IFrameState)
                 id: 'session-username',
                 title: 'The username for the session',
                 placeholder: 'Username'
-            }, { 'required': '' }),
+            }, { 'required': '', tabindex: '2' }),
             /* Password */
             createElement('div', [ 'add-session-input-container', 'container', 'align-horizontal', 'main-start', 'cross-start', 'grow-1' ], [
                 createElement('input', [ 'input-box', 'grow-1', 'round-left-5' ], [], {
@@ -109,7 +104,7 @@ export function assembleAddSessionMenu(frameContext: IFrameState)
                     id: 'session-password',
                     title: 'The password for the session',
                     placeholder: 'Password'
-                }),
+                }, { tabindex: '3' }),
                 createElement('input', [ 'show-password', 'input-small-rect', 'round-right-5' ], [], {
                     type: 'button',
                     name: 'show-password',
@@ -125,12 +120,12 @@ export function assembleAddSessionMenu(frameContext: IFrameState)
                     id: 'ssh-private-key',
                     title: 'The private key for the server',
                     placeholder: 'Private Key'
-                }),
+                }, { tabindex: '4' }),
                 createElement('input', [ 'select-private-key', 'input-small-rect', 'round-right-5' ], [], {
                     title: 'Select a private key file',
                     type: 'button',
                     id: 'ssh-select-private-key'
-                })
+                }, { tabindex: '-1' })
             ]),
             /* Passphrase */
             createElement('input', [ 'add-session-input-container', 'input-box', 'round-5' ], [], {
@@ -139,7 +134,7 @@ export function assembleAddSessionMenu(frameContext: IFrameState)
                 id: 'ssh-passphrase',
                 title: 'The passphrase for the private key',
                 placeholder: 'Passphrase'
-            }),
+            }, { tabindex: '5' }),
             /* Connect button */
             createElement('input', [ 'add-session-input-container', 'container', 'align-horizontal', 'main-center', 'cross-center', 'add-session-button', 'round-5' ], [], {
                 type: 'button',
@@ -147,7 +142,7 @@ export function assembleAddSessionMenu(frameContext: IFrameState)
                 id: 'ssh-add-session',
                 title: 'Add SSH Session',
                 value: 'Add Session'
-            }, { tabindex: '4' })
+            }, { tabindex: '6' })
         ])
     );
 }

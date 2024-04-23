@@ -7,9 +7,8 @@
 /**
  * Interface for managing remote session data.
  */
-export interface IRemoteSessionProperties
-{
-    sessionUid: number; // The unique identifier for the session.
+export interface IRemoteSessionProperties {
+    sessionUid: string; // The unique identifier for the session.
     host: string;
     port?: number;
     username: string;

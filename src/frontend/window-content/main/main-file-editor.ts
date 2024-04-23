@@ -19,11 +19,9 @@ import { IFrameState } from "../../util/IFrameState";
 /**
  * Function that builds the file editor
  */
-export function assembleFileEditor(frameContext: IFrameState)
-{
+export function assembleFileEditor(frameContext: IFrameState) {
     // Generate the previous window.
-    attachFutureListener('action-back', 'click', (event: MouseEvent) =>
-    {
+    attachFutureListener('action-back', 'click', (event: MouseEvent) => {
         showContent(frameContext.previousWindowId, {
             container: frameContext.container,
             parameters: frameContext.previousWindowParameters,
@@ -67,13 +65,11 @@ export function assembleFileEditor(frameContext: IFrameState)
     let contentContainer = document.getElementById('file-editor-container');
 
     // Check if the provided init arguments have the `content` property
-    if ( frameContext.parameters.hasOwnProperty('content') )
-    {
+    if ( frameContext.parameters.hasOwnProperty('content') ) {
 
         let lines: string[] = frameContext.parameters[ 'content' ].split('\n');
 
-        lines.forEach(line =>
-        {
+        lines.forEach(line => {
             appendTo(lineContainer, createElement('div', [ 'line-number' ]));
             appendTo(contentContainer, createElement('span', [ 'line-content' ], [], {
                 innerHTML: __formatHtml(line)
@@ -86,8 +82,7 @@ export function assembleFileEditor(frameContext: IFrameState)
  * Function for removing characters from the provided line if they are not allowed.
  * @param line - The line to remove characters from.
  */
-function __formatHtml(line: string)
-{
+function __formatHtml(line: string) {
     return line
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');

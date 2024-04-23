@@ -9,8 +9,7 @@ let notificationList = [];
  * @param message - The message to show in the notification
  * @param type    - The type of notification to show
  */
-export function notify(message: string, type: NotificationType = 'info')
-{
+export function notify(message: string, type: NotificationType = 'info') {
     let notificationElement = createElement('div', [ 'notification', `notification-${type}` ], [
         createElement('span', [ 'icon', `notification-icon-${type}` ]),
         createElement('span', [], [], { textContent: message })

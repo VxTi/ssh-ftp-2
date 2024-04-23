@@ -11,25 +11,26 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="container main-start align-vertical">
-    <!-- Content container (L->R) -->
-    <div class="full-width full-height container align-horizontal main-start grow-1" id="content">
+<!-- Content container (L->R) -->
+<div class="full-width full-height container align-horizontal main-start grow-1" id="content">
 
-        <!-- Left sidebar (T->B) -->
-        <div class="container align-vertical main-start" id="sidebar-container" expanded>
-            <!-- Sessions container -->
-            <div class="container align-vertical main-start cross-center" id="side-container"></div>
-        </div>
-        <div class="resize-horizontal border-right"></div>
+    <!-- Left sidebar (T->B) -->
+    <div class="container align-vertical main-start" id="sidebar-container" expanded>
+        <!-- Sessions container -->
+        <div class="container align-vertical main-start cross-center" id="side-container"></div>
+    </div>
+    <div class="resize-horizontal border-right"></div>
 
-        <!-- content container (T->B) -->
-        <!-- Inner content must be generated in JavaScript -->
-        <div class="container align-vertical main-start grow-1 nowrap" id="inner-content"></div>
+    <!-- content container (T->B) -->
+    <!-- Inner content must be generated in JavaScript -->
+    <div class="container align-vertical main-start grow-1 nowrap" id="inner-content"></div>
+</div>
+<!-- Status bar -->
+<div class="container align-horizontal bg-primary border-top main-space-between cross-center fit-v-content"
+     id="status-bar">
+    <div class="container align-horizontal main-start cross-center full-width full-height">
+        <div class="icon status-action action-more" id="sidebar-visibility-toggle"></div>
     </div>
-    <!-- Status bar -->
-    <div class="container align-horizontal bg-primary border-top main-space-between cross-center fit-v-content" id="status-bar">
-        <div class="container align-horizontal main-start cross-center full-width full-height">
-            <div class="icon status-action action-more" id="sidebar-visibility-toggle"></div>
-        </div>
-    </div>
+</div>
 </body>
 </html>

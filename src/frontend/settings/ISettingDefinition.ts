@@ -12,8 +12,7 @@ type CheckboxType = 'single' | 'multiple';
 /**
  * Interface for the content of a setting.
  */
-export interface ISettingDefinition
-{
+export interface ISettingDefinition {
     title: string;
     description?: string;
     settingType: SettingType;

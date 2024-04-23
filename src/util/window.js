@@ -9,8 +9,7 @@ let os = require('os');
  * @param {Electron.BrowserWindowConstructorOptions} createArgs The arguments to be passed to the window creation.
  * @returns {Electron.BrowserWindow} The created window.
  */
-function createWindow(pagePath, createArgs = {})
-{
+function createWindow(pagePath, createArgs = {}) {
     let window = new BrowserWindow(Object.assign({
         width: 1200,
         height: 900,

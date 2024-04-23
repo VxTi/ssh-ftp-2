@@ -24,8 +24,7 @@ let settings = [];
 
 const APP_DIRECTORY = path.join(app.getPath('appData'), app.getName());
 
-app.whenReady().then(async () =>
-{
+app.whenReady().then(async () => {
     let indexPath = path.join(__dirname, 'index.html');
 
     // Load in all settings before doing anything.
@@ -36,8 +35,7 @@ app.whenReady().then(async () =>
     // then create the window once they've loaded.
     mainWindow = createWindow(indexPath, { width: 1400, height: 900 });
 
-    app.on('activate', _ =>
-    {
+    app.on('activate', _ => {
         if ( BrowserWindow.getAllWindows().length === 0 )
             mainWindow = createWindow(indexPath);
     })
@@ -49,10 +47,8 @@ ipcMain.on('app:path', event => event.returnValue = APP_DIRECTORY);
 /**
  * Handler for opening the settings window.
  */
-ipcMain.handle('app:settings', async () =>
-{
-    if ( !settingsWindow )
-    {
+ipcMain.handle('app:settings', async () => {
+    if ( !settingsWindow ) {
         settingsWindow = createWindow(path.join(__dirname, 'settings.html'), {
             width: 800,
             height: 600,
@@ -62,3 +58,5 @@ ipcMain.handle('app:settings', async () =>
     }
     settingsWindow.show();
 })
+
+ipcMain.on('app:settings:retrieve', event => event.returnValue = settings);

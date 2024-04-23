@@ -7,8 +7,7 @@
 /**
  * The structure of a theme.
  */
-export interface Theme
-{
+export interface Theme {
     primaryColor: string;
     secondaryColor: string;
     inputColor: string;
@@ -17,6 +16,7 @@ export interface Theme
     inputActiveColor: string;
     inputBorderColor: string;
     inputBorderHoverColor: string;
+    inputActiveTextColor: string;
     borderPrimaryColor: string;
     borderSecondaryColor: string;
     textPrimaryColor: string;
@@ -31,6 +31,7 @@ const __themeConversionMap = {
     'inputColor': 'input-static-bg',
     'inputHoverColor': 'input-hover-bg',
     'inputInactiveColor': 'input-inactive-bg',
+    "inputActiveTextColor": "input-active-text",
     'inputActiveColor': 'input-active-bg',
     'inputBorderColor': 'input-border-bg',
     'inputBorderHoverColor': 'input-border-hover-color',
@@ -43,16 +44,13 @@ const __themeConversionMap = {
 /**
  * Load themes from the `themes.json` file.
  */
-export function loadThemes(): Promise<string[]>
-{
-    return new Promise((resolve, reject) =>
-    {
+export function loadThemes(): Promise<string[]> {
+    return new Promise((resolve, reject) => {
         /**
          * Ensure the themes folder exists
          */
         let themesDir = window[ 'app' ][ 'path' ].join(window[ 'app' ][ 'localFs' ].appDirectory, 'themes');
-        if ( !window[ 'app' ][ 'localFs' ].exists(themesDir) )
-        {
+        if ( !window[ 'app' ][ 'localFs' ].exists(themesDir) ) {
             window[ 'app' ][ 'localFs' ].mkdir(themesDir);
             console.log("Creating themes directory at path", themesDir);
             return resolve([]);
@@ -62,16 +60,12 @@ export function loadThemes(): Promise<string[]>
          * Load all themes from the themes directory
          */
         window[ 'app' ][ 'localFs' ].list(themesDir)
-            .then((files: string[]) =>
-            {
-                Promise.all(files.map(themeFile =>
-                {
+            .then((files: string[]) => {
+                Promise.all(files.map(themeFile => {
                     return window [ 'app' ][ 'localFs' ].read(window[ 'app' ][ 'path' ].join(themesDir, themeFile))
                         .then(JSON.parse)
-                        .then((theme: Theme) =>
-                        {
-                            if ( !theme.hasOwnProperty('themeName') )
-                            {
+                        .then((theme: Theme) => {
+                            if ( !theme.hasOwnProperty('themeName') ) {
                                 console.warn(`Theme ${themeFile} does not have a name property`);
                                 themes.set(themeFile, theme);
                             }
@@ -80,7 +74,11 @@ export function loadThemes(): Promise<string[]>
                         })
                 }))
                     .catch(reject)
-                    .then(() => resolve(Array.from(themes.keys())));
+                    .then(() => {
+                        console.log(`Loaded ${themes.size} theme(s)`)
+                        resolve(Array.from(themes.keys()))
+                    })
+                    .then(() => applyTheme(window.localStorage[ 'theme' ] || (window.localStorage[ 'theme' ] = 'default')))
             });
     });
 }
@@ -89,8 +87,7 @@ export function loadThemes(): Promise<string[]>
  * Get the names of all loaded themes.
  * @returns The names of all loaded themes.
  */
-export function getThemes()
-{
+export function getThemes() {
     return Array.from(themes.keys());
 }
 
@@ -100,25 +97,33 @@ export function getThemes()
  * with `loadThemes` before they can be applied.
  * @param themeName - The name of the theme to apply.
  */
-export function applyTheme(themeName: string)
-{
-    let theme = themes.get(themeName);
+export function applyTheme(themeName: string) {
     let styleElement = document.getElementById('theme-styles');
-    if ( !theme )
-    {
+
+    // If the 'default' theme is provided,
+    // remove the theme element if it's present.
+    if ( themeName === 'default' ) {
+        styleElement?.remove();
+        window.localStorage[ 'theme' ] = themeName;
+        return;
+    }
+
+    let theme = themes.get(themeName);
+    if ( !theme ) {
         console.warn(`Unable to load theme '${themeName}': Theme not found. Setting default.`);
-        styleElement.remove();
+        styleElement?.remove(); // Remove if present
         return;
     }
 
     console.log(`Applying theme '${themeName}'`);
 
+    window.localStorage[ 'theme' ] = themeName;
+
 
     // Make sure the style element exists
     if ( styleElement )
         styleElement.remove();
-    else
-    {
+    else {
         styleElement = document.createElement('style');
         styleElement.id = 'theme-styles';
     }
@@ -131,4 +136,5 @@ export function applyTheme(themeName: string)
     document.head.appendChild(styleElement);
 }
 
-window['applyTheme'] = applyTheme;
+window[ 'applyTheme' ] = applyTheme;
+window[ 'getThemes' ] = getThemes;

@@ -3,8 +3,7 @@ import { IFileInfo } from "./IFileInfo";
 import { LocalFileSystem } from "./LocalFileSystem";
 import { AbstractFile } from "./AbstractFile";
 
-export class RemoteFileSystem implements IAbstractFileSystem
-{
+export class RemoteFileSystem implements IAbstractFileSystem {
 
     readonly sessionUid: string;
 
@@ -12,8 +11,7 @@ export class RemoteFileSystem implements IAbstractFileSystem
 
     private static readonly fileListExpr: RegExp = /([-drwx+@]+)\s+(\d+)\s+([a-zA-Z0-9._-]+)\s+([a-zA-Z0-9._-]+)\s+(\d+)\s+(\w{3})\s+(\d{1,2})\s+(\d{1,2}:\d{1,2}|\d{4})\s+(.+)/
 
-    constructor(sessionUid: string, cwd?: string)
-    {
+    constructor(sessionUid: string, cwd?: string) {
         this.sessionUid = sessionUid;
         if ( cwd )
             this.cwd = cwd;
@@ -25,8 +23,7 @@ export class RemoteFileSystem implements IAbstractFileSystem
      * Delete files from the remote file system.
      * @param paths
      */
-    deleteFiles(paths: string[]): Promise<void>
-    {
+    deleteFiles(paths: string[]): Promise<void> {
         return window[ 'app' ][ 'sessions' ][ 'fs' ].delete(this.sessionUid, paths);
     }
 
@@ -34,16 +31,14 @@ export class RemoteFileSystem implements IAbstractFileSystem
      * Get the file information for the given path.
      * @param path
      */
-    fileInfo(path: string): Promise<IFileInfo>
-    {
+    fileInfo(path: string): Promise<IFileInfo> {
         return window[ 'app' ][ 'sessions' ][ 'fs' ].info(this.sessionUid, path);
     }
 
     /**
      * Get the home directory of the remote file system.
      */
-    homeDirectory(): Promise<string>
-    {
+    homeDirectory(): Promise<string> {
         return window[ 'app' ][ 'sessions' ][ 'fs' ].homeDir(this.sessionUid);
     }
 
@@ -52,43 +47,10 @@ export class RemoteFileSystem implements IAbstractFileSystem
      * This can be retrieved afterward.
      * @param path
      */
-    listFiles(path: string): Promise<AbstractFile[]>
-    {
-        return Promise.resolve(window[ 'app' ][ 'sessions' ]
-            .exec(this.sessionUid, `ls -a -l ${path}`)
-            .then((result: string) =>
-            {
-                return result.split('\n')
-                    .filter(file => file !== '..' && file !== '.')
-                    .slice(1)
-                    .map(data =>
-                    {
-                        let parameters = data.match(RemoteFileSystem.fileListExpr);
-                        if ( !parameters )
-                            throw new Error("Unable to parse file data: \n" + data);
-
-                        const [ , permissions, fileCount, owner, group, size, month, date, yearOrTime, filename ] = parameters;
-
-                        let fileType = permissions.charAt(0) === 'd' ? 'directory' :
-                            filename.indexOf('.') !== -1 ? filename.split('.').pop() : 'file';
-                        return new AbstractFile(
-                            filename,
-                            path,
-                            fileType,
-                            {
-                                hidden: filename.charAt(0) === '.',
-                                size: parseInt(size),
-                                dateModified: Date.parse(`${month} ${date} ${yearOrTime}`),
-                                permissions: permissions,
-                                name: filename,
-                                path: path,
-                                isFile: fileType !== 'directory',
-                                isDirectory: fileType === 'directory',
-                                type: fileType
-                            } as IFileInfo
-                        )
-                    })
-            }))
+    async listFiles(path: string): Promise<AbstractFile[]> {
+        return window[ 'app' ][ 'sessions' ][ 'fs' ].list(this.sessionUid, path)
+            .then((filesInfo: IFileInfo[]) => filesInfo.map(fileInfo =>
+                new AbstractFile(fileInfo.name, fileInfo.path, fileInfo.type, fileInfo)));
     }
 
     /**
@@ -98,24 +60,21 @@ export class RemoteFileSystem implements IAbstractFileSystem
      * @param newPath
      * @param dstFs
      */
-    moveFile(oldPath: string, newPath: string, dstFs: IAbstractFileSystem): Promise<void>
-    {
+    moveFile(oldPath: string, newPath: string, dstFs: IAbstractFileSystem): Promise<void> {
         if ( dstFs instanceof RemoteFileSystem )
             return window[ 'app' ][ 'sessions' ][ 'fs' ].move(this.sessionUid, oldPath, newPath);
 
         if ( dstFs instanceof LocalFileSystem )
-            return window[ 'app' ][ 'localFs' ].upload(this.sessionUid, oldPath, newPath);
+            return window[ 'app' ][ 'sessions' ][ 'fs' ].download(this.sessionUid, [ oldPath ], newPath);
 
         throw new Error("Unable to move file: Unsupported file system.");
     }
 
-    readFile(path: string): Promise<string>
-    {
+    readFile(path: string): Promise<string> {
         return window[ 'app' ][ 'sessions' ].exec(this.sessionUid, `cat ${path}`)
     }
 
-    putFiles(files: { path: string, content: string }[]): Promise<void>
-    {
+    putFiles(files: { path: string, content: string }[]): Promise<void> {
         throw new Error("Method 'putFiles' in RemoteFileSystem not yet implemented.");
     }
 

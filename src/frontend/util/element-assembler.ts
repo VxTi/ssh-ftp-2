@@ -23,8 +23,7 @@ export function createElement(type: string, classes?: string[], children: HTMLEl
     [ key: string ]: any
 } = {}, attributes: {
     [ key: string ]: string
-} = {}): HTMLElement
-{
+} = {}): HTMLElement {
     let element = document.createElement(type);
     if ( classes.length > 0 )
         element.classList.add(...classes);
@@ -48,12 +47,10 @@ export function createElement(type: string, classes?: string[], children: HTMLEl
  * @param eventType The type of event to listen for.
  * @param listener The event listener to attach.
  */
-export function attachFutureListener(elementId: string, eventType: string, listener: EventListener)
-{
+export function attachFutureListener(elementId: string, eventType: string, listener: EventListener) {
     // If the element already exists, attach the event listener
     let reference = document.getElementById(elementId);
-    if ( reference )
-    {
+    if ( reference ) {
         reference.addEventListener(eventType, listener);
         return;
     }
@@ -75,18 +72,15 @@ export function attachFutureListener(elementId: string, eventType: string, liste
  * @param targetElement The element to append the elements to.
  * @param elements The elements to append to the target element.
  */
-export function appendTo(targetElement: HTMLElement, ...elements: HTMLElement[])
-{
+export function appendTo(targetElement: HTMLElement, ...elements: HTMLElement[]) {
     elements.forEach(element => targetElement.appendChild(element));
 
-    __queuedEventListeners.forEach((eventListeners, elementId) =>
-    {
+    __queuedEventListeners.forEach((eventListeners, elementId) => {
         let targetElement = document.getElementById(elementId);
         if ( !targetElement )
             return;
         // Attach the event listeners to the target element
-        eventListeners.forEach((listeners, eventType) =>
-        {
+        eventListeners.forEach((listeners, eventType) => {
             listeners.forEach(listener => targetElement.addEventListener(eventType, listener))
             __queuedEventListeners.delete(elementId); // Remove the event listeners from the queue
         })

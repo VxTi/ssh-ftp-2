@@ -13,12 +13,10 @@ let settingContent: HTMLElement = null;
 let sessionData: ISettingEntry[] = [];
 let currentlyVisibleSettingId: string = null;
 
-document.addEventListener('DOMContentLoaded', () =>
-{
+document.addEventListener('DOMContentLoaded', () => {
 
     // Create navigator if the user is on a Mac
-    if ( window[ 'app' ][ 'os' ].isMac )
-    {
+    if ( window[ 'app' ][ 'os' ].isMac ) {
         let navigator = document.createElement('div');
         navigator.id = 'navigator';
         navigator.classList.add('navigator', 'border-bottom');
@@ -40,8 +38,7 @@ document.addEventListener('DOMContentLoaded', () =>
  * @param indentation - The indentation of the settings item.
  * @param appendAfter - The element to append the settings item after.
  */
-function createSettingsItem(entry: ISettingEntry, indentation: number = 0, appendAfter?: HTMLElement)
-{
+function createSettingsItem(entry: ISettingEntry, indentation: number = 0, appendAfter?: HTMLElement) {
     let element = createElement('div', [ 'session-item' ], [], {
         id: entry.identifier,
         innerText: entry.title,
@@ -56,14 +53,11 @@ function createSettingsItem(entry: ISettingEntry, indentation: number = 0, appen
     else
         settingsList.appendChild(element);
 
-    element.addEventListener('click', () =>
-    {
+    element.addEventListener('click', () => {
         // Check if the setting entry can expand and has content
-        if ( entry.expandable && entry.content.length > 0 )
-        {
+        if ( entry.expandable && entry.content.length > 0 ) {
             let previous = element;
-            (entry.content as ISettingEntry[]).forEach(entry =>
-            {
+            (entry.content as ISettingEntry[]).forEach(entry => {
                 previous = createSettingsItem(entry, indentation + 1, previous);
             });
         }
@@ -76,8 +70,7 @@ function createSettingsItem(entry: ISettingEntry, indentation: number = 0, appen
  * Show the settings of a specific identifier.
  * @param setting - The setting to show.
  */
-function viewSetting(setting: ISettingEntry)
-{
+function viewSetting(setting: ISettingEntry) {
     // If the setting is not found, or the setting is already visible, return.
     if ( !setting )
         return;
@@ -90,12 +83,10 @@ function viewSetting(setting: ISettingEntry)
         })
     );
 
-    (setting.content as ISettingDefinition[]).forEach(setting =>
-    {
+    (setting.content as ISettingDefinition[]).forEach(setting => {
         console.log(setting);
 
-        switch ( setting.settingType )
-        {
+        switch ( setting.settingType ) {
             case 'input':
 
                 break;

@@ -1,23 +1,19 @@
-export class CircularLoadingElement extends HTMLElement
-{
+export class CircularLoadingElement extends HTMLElement {
     /**
      * Constructor for the circular loading element.
      */
-    constructor()
-    {
+    constructor() {
         super();
     }
 
     /**
      * Handler for when the element is connected to the DOM.
      */
-    connectedCallback()
-    {
+    connectedCallback() {
         let containerElement = document.createElement('div');
         containerElement.classList.add('circular-loader-container');
 
-        for ( let i = 0; i < 8; i++ )
-        {
+        for ( let i = 0; i < 8; i++ ) {
             let rotorElement = document.createElement('div');
             rotorElement.classList.add('circular-loader-rotor');
             rotorElement.style.animationDelay = `${i * 0.125}s`;
