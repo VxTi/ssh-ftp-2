@@ -1,11 +1,8 @@
-### Transference - An SSH File Transfer Tool
+### SFTP Client (Remake)
 
----
+This is a rewrite for my previous SFTP project, with a variety of optimizations. 
 
-Transference is a simple tool that allows you to transfer files between two computers using SSH. 
-It is mainly written in TypeScript and uses the Node.js API to interact with the file system and the SSH protocol.
+This application, just like the previous one, is written in TypeScript and utilizes the Electron API.
+The main function of this application is providing the user with intuitive SFTP functionality, outside of the terminal (just like many other existing ones).
 
-This is the predecessor of the SSH-FTP project; this is made to improve the user experience and the performance of 
-the file transfer.
-
----
+Please keep in mind that this is still a work-in-progress.
